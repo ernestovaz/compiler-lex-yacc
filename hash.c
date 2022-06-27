@@ -52,9 +52,8 @@ void handleCollision(HashTable* hashtable, int index, Item* item){
 void insert(HashTable* hashtable, char* key, int data){
     Item* newItem = (Item*) malloc(sizeof(Item));
     newItem->key = (char*) malloc(sizeof(key));
-    newItem->value = (int) malloc(sizeof(data));
     strcpy(newItem->key, key);
-    strcpy(newItem->value, data);
+    newItem->value = data;
 
     int index = hashFunction(key);
     
@@ -90,7 +89,7 @@ int search(HashTable* hashtable, char* key){
             return item->value;
         }
         if (head == NULL){
-            return NULL;
+            return -1;
         }
         item = head->item;
         head = head->next;
@@ -118,7 +117,7 @@ void printTable(HashTable* hashtable){
                 printf(" => Overflow Bucket => ");
                 LinkedList* head = hashtable->overflowBuckets[i];
                 while (head) {
-                    printf("Key:%s, Value:%s ", head->item->key, head->item->value);
+                    printf("Key:%s, Value:%d ", head->item->key, head->item->value);
                     head = head->next;
                 }
             }
