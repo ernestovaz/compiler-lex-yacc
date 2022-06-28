@@ -63,7 +63,7 @@ void insert(HashTable* hashtable, char* key, int data){
             printf("Error: Hash Table is full\n");
             return;
         }
-        hashtable->table[index] = item;
+        hashtable->table[index] = newItem;
         hashtable->count++;
     }
     else{
