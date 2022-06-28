@@ -7,7 +7,7 @@ LinkedList** createOverflowBuckets(HashTable* table) {
     // Create the overflow buckets; an array of linkedlists
     LinkedList** buckets = (LinkedList**) calloc (table->size, sizeof(LinkedList*));
     for (int i=0; i<table->size; i++)
-                   buckets[i] = NULL;
+        buckets[i] = NULL;
     return buckets;
 }
 
@@ -28,10 +28,11 @@ int hashFunction(char* key){
     int sum = 0;
 
     for (int i=0; i<strlen(key); i++){
-        sum = 3*sum+(int)key[i];
+        sum = (3*sum+(int)key[i]) % TABLESIZE;
     }
+
     
-    return sum%TABLESIZE;
+    return sum;
 }
 
 void handleCollision(HashTable* hashtable, int index, Item* item){
@@ -44,7 +45,8 @@ void handleCollision(HashTable* hashtable, int index, Item* item){
         return;
     }
     else{
-        hashtable->overflowBuckets[index] = linkedlistInsert(head, item);
+        //hashtable->overflowBuckets[index] = linkedlistInsert(head, item);
+        linkedlistInsert(head,item);
         return;
     }
 }
@@ -72,7 +74,7 @@ void insert(HashTable* hashtable, char* key, int data){
             return;
         }
         else{
-            handleCollision(hashtable, index, item);
+            handleCollision(hashtable, index, newItem);
             return;
         }
     }
@@ -131,7 +133,10 @@ int main(){
     HashTable* hashtable = createTable();
     insert(hashtable, "palavra", 1);
     insert(hashtable, "segunda", 2);
+    insert(hashtable, "segunda", 2);
     insert(hashtable, "naosei", 4);
+    insert(hashtable, "naosei", 5);
+    insert(hashtable, "naosei", 6);
 
     printTable(hashtable);
     return 0;
