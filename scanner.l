@@ -8,34 +8,27 @@ int g_running = 1;
 
 %%
 
-// reserved words
-if                      { return KW_IF; }
+if                      { return KW_IF; } // reserved words
 else                    { return KW_ELSE; }
 while                   { return KW_WHILE; }
 read                    { return KW_READ; }
 print                   { return KW_PRINT; }
 return                  { return KW_RETURN; }
 
-// special characters
-[;()\[\]{}+\-./<>&|~]   { return yytext[0]; }
+[;()\[\]{}+\-./<>&|~]   { return yytext[0]; } //special characters
 
-// compound operators
-\<-                     { return ASSIGNMENT; }
+\<-                     { return ASSIGNMENT; } //compound operators
 \<=                     { return OPERATOR_LE; }
 >=                      { return OPERATOR_GE; }
 ==                      { return OPERATOR_EQ; }
 !=                      { return OPERATOR_DIF; }
 
-// identifiers
-[A-z_]*                 { return TK_IDENTIFIER; }
+[A-z_]+                 { return TK_IDENTIFIER; } //identifiers
 
-// whitespaces 
-[ \t]                   {}    // do nothing
+[ \t]                   {}    // whitespaces, do nothing
 
-// unexpected characters
 .                       { return TOKEN_ERROR; }
 
-// end of file
 <<EOF>>                 { g_running = 0;  return 0; }
 
 %%
