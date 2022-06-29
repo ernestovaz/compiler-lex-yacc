@@ -2,34 +2,59 @@
 
 #include "tokens.h"
 
-int g_running = 1;
+int running  = 1;
+int lineNumber = 1;
+
+int getLineNumber(void) {
+  return lineNumber;
+}
+
+int isRunning(void) {
+  return running;
+}
   
 %}
 
+%x COMMENT
+
 %%
 
-if                      { return KW_IF; } // reserved words
-else                    { return KW_ELSE; }
-while                   { return KW_WHILE; }
-read                    { return KW_READ; }
-print                   { return KW_PRINT; }
-return                  { return KW_RETURN; }
+if                        { return KW_IF; } // reserved words
+else                      { return KW_ELSE; }
+while                     { return KW_WHILE; }
+read                      { return KW_READ; }
+print                     { return KW_PRINT; }
+return                    { return KW_RETURN; }
 
-[;()\[\]{}+\-./<>&|~]   { return yytext[0]; } //special characters
+[;()\[\]{}+\-./<>&|~]     { return yytext[0]; } //special characters
 
-\<-                     { return ASSIGNMENT; } //compound operators
-\<=                     { return OPERATOR_LE; }
->=                      { return OPERATOR_GE; }
-==                      { return OPERATOR_EQ; }
-!=                      { return OPERATOR_DIF; }
+\<-                       { return ASSIGNMENT; } //compound operators
+\<=                       { return OPERATOR_LE; }
+>=                        { return OPERATOR_GE; }
+==                        { return OPERATOR_EQ; }
+!=                        { return OPERATOR_DIF; }
 
-[A-z_]+                 { return TK_IDENTIFIER; } //identifiers
+[A-Za-z_]+                { return TK_IDENTIFIER; } //identifiers
 
-[ \t]                   {}    // whitespaces, do nothing
+[0-9]+,[0-9]+             { return LIT_FLOAT; } //literals 
+[0-9]+                    { return LIT_INTEGER; } 
+'([^\'\n\t]|\\'|\\n)'     { return LIT_CHAR; } 
+\"([^\"\n\t]|\\\"|\\n)\"  { return LIT_STRING; }
 
-.                       { return TOKEN_ERROR; }
+##.*                      {} // comment, ignore line
 
-<<EOF>>                 { g_running = 0;  return 0; }
+\\#                       { BEGIN COMMENT; }
+
+<*>\n                     { lineNumber++; } 
+
+[ \t]                     {} // whitespaces, do nothing
+
+.                         { return TOKEN_ERROR; }
+
+<<EOF>>                   { running = 0; return 0; }
+
+<COMMENT>([^#\n]|#)       {} // ignore 
+<COMMENT>#\/              { BEGIN 0; } // ignore 
 
 %%
 

@@ -56,10 +56,10 @@ void pretty_print(int char_code){
 }
 
 int main(void) {
-  while(g_running) {
+  while(running) {
     int code = yylex();
-    pretty_print(code);
+    if(code) pretty_print(code);
   }
-    
+  fprintf(stderr, "Read %d lines!\n", lineNumber);
   return 0;
 }
