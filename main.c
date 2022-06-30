@@ -1,5 +1,7 @@
 #define MAX_ASCII_CHAR_CODE 127
 
+#include "HashTable.h"
+
 char* get_token_name(int char_code){
   switch(char_code){
     case 256:
@@ -56,6 +58,15 @@ void pretty_print(int char_code){
 }
 
 int main(void) {
+    HashTable* hashtable = createTable();
+    insert(hashtable, "palavra", "dado");
+    insert(hashtable, "segunda", "dados");
+    insert(hashtable, "segunda", "valor");
+    insert(hashtable, "naosei", "scooby doo");
+    insert(hashtable, "naosei", "uau");
+    insert(hashtable, "naosei", "hihih");
+
+    printTable(hashtable);
   while(running) {
     int code = yylex();
     if(code) pretty_print(code);
