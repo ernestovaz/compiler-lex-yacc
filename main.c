@@ -58,16 +58,7 @@ void pretty_print(int char_code){
 }
 
 int main(void) {
-  /*
-    insert(hashtable, "palavra", "dado");
-    insert(hashtable, "segunda", "dados");
-    insert(hashtable, "segunda", "valor");
-    insert(hashtable, "naosei", "scooby doo");
-    insert(hashtable, "naosei", "uau");
-    insert(hashtable, "naosei", "hihih");
-
-    printTable(hashtable);
-    */
+  initMe();
   while(running) {
     int code = yylex();
     if(code) pretty_print(code);

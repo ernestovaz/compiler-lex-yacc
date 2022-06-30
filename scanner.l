@@ -14,6 +14,10 @@ int getLineNumber(void) {
 int isRunning(void) {
   return running;
 }
+
+void initMe(void) {
+  hashTable = createTable();
+}
   
 %}
 
@@ -22,7 +26,6 @@ int isRunning(void) {
 %%
 
 %{
-if(hashTable == NULL) hashTable = createTable();
 
 
 
