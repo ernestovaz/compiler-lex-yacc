@@ -1,9 +1,11 @@
 %{
 
 #include "tokens.h"
+#include "HashTable.h"
 
 int running  = 1;
 int lineNumber = 1;
+HashTable* hashTable = NULL;
 
 int getLineNumber(void) {
   return lineNumber;
@@ -19,6 +21,13 @@ int isRunning(void) {
 
 %%
 
+%{
+if(hashTable == NULL) hashTable = createTable();
+
+
+
+%}
+
 if                        { return KW_IF; } // reserved words
 else                      { return KW_ELSE; }
 while                     { return KW_WHILE; }
@@ -28,13 +37,15 @@ return                    { return KW_RETURN; }
 
 [;()\[\]{}+\-./<>&|~]     { return yytext[0]; } //special characters
 
+
 \<-                       { return ASSIGNMENT; } //compound operators
 \<=                       { return OPERATOR_LE; }
 >=                        { return OPERATOR_GE; }
 ==                        { return OPERATOR_EQ; }
 !=                        { return OPERATOR_DIF; }
 
-[A-Za-z_]+                { return TK_IDENTIFIER; } //identifiers
+[A-Za-z_]+                { insert(hashTable, yytext, yytext);
+                              return TK_IDENTIFIER; } //identifiers
 
 [0-9]+,[0-9]+             { return LIT_FLOAT; } //literals 
 [0-9]+                    { return LIT_INTEGER; } 
@@ -59,6 +70,7 @@ return                    { return KW_RETURN; }
 %%
 
 int yywrap(void) {
+  printTable(hashTable);
   return 1;
 }
 

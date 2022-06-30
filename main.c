@@ -58,7 +58,7 @@ void pretty_print(int char_code){
 }
 
 int main(void) {
-    HashTable* hashtable = createTable();
+  /*
     insert(hashtable, "palavra", "dado");
     insert(hashtable, "segunda", "dados");
     insert(hashtable, "segunda", "valor");
@@ -67,9 +67,11 @@ int main(void) {
     insert(hashtable, "naosei", "hihih");
 
     printTable(hashtable);
+    */
   while(running) {
     int code = yylex();
     if(code) pretty_print(code);
+    printTable(hashTable);
   }
   fprintf(stderr, "Read %d lines!\n", lineNumber);
   return 0;

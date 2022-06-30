@@ -15,7 +15,7 @@ HashTable* createTable(){
     return hashtable;
 }
 
-void insert(HashTable* hashtable, const char* key, const char* value){
+void insert(HashTable* hashtable, char* key, char* value){
     HashTableNode* node = createNode(key, value);
 
     int index = hashFunction(key);
@@ -29,18 +29,12 @@ void insert(HashTable* hashtable, const char* key, const char* value){
         hashtable->count++;
     }
     else{
-        if (strcmp(position->key, key) != 0){
-            hashtable->table[index]->value = value;
-            return;
-        } else{
-            handleCollision(position, node);
-            return;
-        }
+        handleCollision(position, node);
     }
 
 }
 
-const char* search(HashTable* hashtable, const char* key){
+char* search(HashTable* hashtable, char* key){
     int index = hashFunction(key);
     HashTableNode* node = hashtable->table[index];
 
@@ -69,7 +63,7 @@ void freeTable(HashTable* hashTable) {
     free(hashTable);
 }
 
-void printSearch(HashTable* hashTable, const char* key){
+void printSearch(HashTable* hashTable, char* key){
     const char* value = search(hashTable, key);
     if (value == NULL){
         printf("%s does not exist\n", key);
@@ -103,7 +97,7 @@ void printTable(HashTable* hashTable){
 }
 
 
-int hashFunction(const char* key){
+int hashFunction(char* key){
     int sum = 0;
     for (int i=0; i<strlen(key); i++){
         sum = (3*sum+(int)key[i]) % TABLE_SIZE;
@@ -111,16 +105,25 @@ int hashFunction(const char* key){
     return sum;
 }
 
-HashTableNode* createNode(const char* key, const char* value) {
+HashTableNode* createNode(char* key, char* value) {
     HashTableNode* node = malloc(sizeof(HashTableNode));
-    node->key   = key;
-    node->value = value;
+    node->key = (char*) malloc (strlen(key) + 1);
+    node->value = (char*) malloc (strlen(value) + 1);
+    strcpy(node->key, key);
+    strcpy(node->value, value);
     return node;
 }
 
 void handleCollision(HashTableNode* position, HashTableNode* node){
-    while(position->next != NULL) {
+    while(position != NULL){
+        if (strcmp(position->key, node->key) == 0){
+            strcpy(position->value, node->value);
+            return;
+        } 
+        if (position->next == NULL) {
+            position->next = node;
+            return;
+        }
         position = position->next;
     }
-    position->next = node;
 }
