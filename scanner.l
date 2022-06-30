@@ -44,13 +44,17 @@ return                    { return KW_RETURN; }
 ==                        { return OPERATOR_EQ; }
 !=                        { return OPERATOR_DIF; }
 
-[A-Za-z_]+                { insert(hashTable, yytext, yytext);
-                              return TK_IDENTIFIER; } //identifiers
+[A-Za-z_]+                { insert(hashTable, yytext, yytext); //identifiers
+                            return TK_IDENTIFIER; } 
 
-[0-9]+,[0-9]+             { return LIT_FLOAT; } //literals 
-[0-9]+                    { return LIT_INTEGER; } 
-'([^\'\n\t]|\\'|\\n)'     { return LIT_CHAR; } 
-\"([^\"\n\t]|\\\"|\\n)\"  { return LIT_STRING; }
+[0-9]+,[0-9]+             { insert(hashTable, yytext, yytext); //literals
+                            return LIT_FLOAT; } 
+[0-9]+                    { insert(hashTable, yytext, yytext);
+                            return LIT_INTEGER; } 
+'([^\'\n\t]|\\'|\\n)'     { insert(hashTable, yytext, yytext); 
+                            return LIT_CHAR; } 
+\"([^\"\n\t]|\\\"|\\n)+\"  { insert(hashTable, yytext, yytext); 
+                            return LIT_STRING; }
 
 ##.*                      {} // comment, ignore line
 
@@ -65,12 +69,11 @@ return                    { return KW_RETURN; }
 <<EOF>>                   { running = 0; return 0; }
 
 <COMMENT>([^#\n]|#)       {} // ignore 
-<COMMENT>#\/              { BEGIN 0; } // ignore 
+<COMMENT>#\/              { BEGIN 0; } // end comment mode 
 
 %%
 
 int yywrap(void) {
-  printTable(hashTable);
   return 1;
 }
 
