@@ -1,1 +1,15 @@
-1500
+## UFRGS - Compiladores - Marcelo Johann - 2022/1
+
+char c('x');
+char d(100);
+int a ('A');
+int i(1);
+## an array should be here
+## an array should be here
+float f (2,5);
+
+\#
+This is a comment
+of multiple lines
+\#
+

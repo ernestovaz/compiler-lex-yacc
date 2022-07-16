@@ -1,5 +1,5 @@
 etapa2 
 lex.yy.c
-yy.tab.c
-yy.tab.h
+y.tab.c
+y.tab.h
 a.out

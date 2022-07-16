@@ -30,7 +30,26 @@
 
 %%
 
-PROGRAM: TK_IDENTIFIER | LIT_INTEGER ;
+PROGRAM:                      GLOBAL_DECLARATION_LIST;
+GLOBAL_DECLARATION_LIST:      GLOBAL_DECLARATION  
+                              | GLOBAL_DECLARATION GLOBAL_DECLARATION_LIST
+                              | /*empty*/ ;
+GLOBAL_DECLARATION:           FUNCTION_DECLARATION 
+                              | VARIABLE_DECLARATION;
+
+FUNCTION_DECLARATION:         '?' /*implement this*/;
+VARIABLE_DECLARATION:         TYPE_KEYWORD IDENTIFIER '(' LITERAL_VALUE ')' ';' /*todo: treat arrays */;
+
+IDENTIFIER:                   TK_IDENTIFIER;
+TYPE_KEYWORD:                 KW_CHAR 
+                              | KW_INT
+                              | KW_FLOAT;
+
+LITERAL_VALUE:                LIT_INTEGER 
+                              | LIT_FLOAT
+                              | LIT_CHAR
+                              | LIT_STRING;
+
 
 %%
 
