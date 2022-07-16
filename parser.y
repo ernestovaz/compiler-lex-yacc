@@ -30,20 +30,30 @@
 
 %%
 
-PROGRAM:                      GLOBAL_DECLARATION_LIST;
-GLOBAL_DECLARATION_LIST:      GLOBAL_DECLARATION  
-                              | GLOBAL_DECLARATION GLOBAL_DECLARATION_LIST
+PROGRAM:                      GLOBAL_DEFINITION_LIST;
+GLOBAL_DEFINITION_LIST:       GLOBAL_DEFINITION  GLOBAL_DEFINITION_LIST
+                              | GLOBAL_DEFINITION
                               | /*empty*/ ;
-GLOBAL_DECLARATION:           FUNCTION_DECLARATION 
-                              | VARIABLE_DECLARATION;
+GLOBAL_DEFINITION:            FUNCTION_DEFINITION 
+                              | VARIABLE_DEFINITION;
 
-FUNCTION_DECLARATION:         '?' /*implement this*/;
-VARIABLE_DECLARATION:         TYPE_KEYWORD IDENTIFIER '(' LITERAL_VALUE ')' ';' /*todo: treat arrays */;
+FUNCTION_DEFINITION:          '?' /*implement this*/;
+
+
+VARIABLE_DEFINITION:          SINGLE_VARIABLE_DECLARATION
+                              | ARRAY_DEFINITION;
+SINGLE_VARIABLE_DECLARATION:  TYPE_KEYWORD IDENTIFIER '(' LITERAL_VALUE ')' ';';
+ARRAY_DEFINITION:             TYPE_KEYWORD IDENTIFIER '[' ARRAY_SIZE_VALUE ']' LITERAL_VALUE_LIST ';'
 
 IDENTIFIER:                   TK_IDENTIFIER;
 TYPE_KEYWORD:                 KW_CHAR 
                               | KW_INT
                               | KW_FLOAT;
+ARRAY_SIZE_VALUE:             LIT_INTEGER;
+
+LITERAL_VALUE_LIST:           LITERAL_VALUE LITERAL_VALUE_LIST
+                              | LITERAL_VALUE 
+                              | /*empty*/;
 
 LITERAL_VALUE:                LIT_INTEGER 
                               | LIT_FLOAT
