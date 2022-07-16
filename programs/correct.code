@@ -14,3 +14,46 @@ of multiple lines
 \#
 
 
+int main ()
+  {
+##  a <- 0;
+##  a <- a - i;
+##  a <- 5;
+##  v[a] <- 55;
+##  print v[5];
+##  print a;
+##  i <- 2;
+##
+##  print "Digite um numero: \n";
+##  read a;
+##  print "Digite mais um numero: \n";
+##  read v[a];
+##
+##  while (i<10)
+##    {
+##    i <- incn(i 1);
+##    a <- incn(a a);
+##    };
+##
+##  print "Incrementado algumas vezes a fica " (2+x)a "\n";
+##
+##  if (a == 15)
+##    {
+##    a <- a + 1;
+##    print "A era=15\n";
+##    };
+##    
+##  if (i==100)
+##    {
+##    print "Nao tem como isso...\n"
+##    }
+##  else
+##    print "OK!\n"; {{}}
+  }
+
+int incn (int x int n )
+  {
+##  return x + n
+  }
+
+## end of file
