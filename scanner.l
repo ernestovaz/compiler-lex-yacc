@@ -31,7 +31,11 @@ void initMe(void) {
 
 %}
 
-if                        { return KW_IF; } // reserved words
+
+char                      { return KW_CHAR; } // reserved words
+int                       { return KW_INT; }
+float                     { return KW_FLOAT; }
+if                        { return KW_IF; } 
 else                      { return KW_ELSE; }
 while                     { return KW_WHILE; }
 read                      { return KW_READ; }
