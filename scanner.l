@@ -1,11 +1,12 @@
 %{
 
-#include "tokens.h"
+#include "y.tab.h"
 #include "HashTable.h"
 
 int running  = 1;
 int lineNumber = 1;
 HashTable* hashTable = NULL;
+FILE* yyin;
 
 int getLineNumber(void) {
   return lineNumber;
@@ -84,5 +85,6 @@ int yywrap(void) {
   return 1;
 }
 
+#include "y.tab.c"
 #include "main.c"
 

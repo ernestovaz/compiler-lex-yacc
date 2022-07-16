@@ -57,13 +57,12 @@ void pretty_print(int char_code){
   }
 }
 
-int main(void) {
-  initMe();
-  while(running) {
-    int code = yylex();
-    if(code) pretty_print(code);
-    printTable(hashTable);
+int main(int argc, char** argv) {
+  if (argc == 2) {
+    yyin = fopen(argv[1], "r");
   }
-  fprintf(stderr, "Read %d lines!\n", lineNumber);
-  return 0;
+  initMe();
+  yyparse();
+  fprintf(stderr, "Program successfully parsed.\n");
+  exit(0);
 }

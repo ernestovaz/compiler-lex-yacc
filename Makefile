@@ -1,13 +1,23 @@
 .PHONY: run
 
-etapa1: lex.yy.c
-		gcc -o etapa1 lex.yy.c HashTable.c
+etapa2: y.tab.c lex.yy.c
+		gcc -o etapa2 lex.yy.c HashTable.c
+
+y.tab.c: parser.y
+	yacc -d parser.y
 
 lex.yy.c: scanner.l
 		lex scanner.l
 
+.PHONY: run test
 clean:
-		rm lex.yy.c etapa1
+		rm -f lex.yy.c lex.yy.h y.tab.c etapa2
 
-run: etapa1
-		./etapa1
+run: etapa2
+		./etapa2
+
+test: etapa2
+		@echo 
+		./etapa2 programs/correct.code || true
+		@echo 
+		./etapa2 programs/incorrect.code || true
