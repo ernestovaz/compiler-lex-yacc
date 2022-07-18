@@ -16,13 +16,13 @@ of multiple lines
 
 int main ()
   {
-##  a <- 0;
-##  a <- a - i;
-##  a <- 5;
+  a <- 0;
+  a <- a - i;
+  a <- 5;
 ##  v[a] <- 55;
 ##  print v[5];
 ##  print a;
-##  i <- 2;
+  i <- 2;
 ##
 ##  print "Digite um numero: \n";
 ##  read a;

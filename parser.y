@@ -24,6 +24,14 @@
 
 %token TOKEN_ERROR
 
+%left '|'
+%left '&'
+%left OPERATOR_EQ OPERATOR_DIF
+%left '<' '>' OPERATOR_LE OPERATOR_GE
+%left '+' '-'
+%left '.' '/'
+%right '~'
+
 %{
   int yyerror(char* s);
 %}
@@ -43,8 +51,29 @@ PARAMETER_LIST:               PARAMETER PARAMETER_LIST
                               | /*empty*/;
 PARAMETER:                    TYPE_KEYWORD IDENTIFIER;
 COMMAND_BLOCK:                '{' COMMAND_LIST '}';
-COMMAND_LIST:                 /* TO BE IMPLEMENTED */;
+COMMAND_LIST:                 COMMAND ';' COMMAND_LIST
+			      | /*empty*/;
+COMMAND:		      ASSIGNMENT_COMMAND;
 
+ASSIGNMENT_COMMAND: 	      IDENTIFIER ASSIGNMENT EXPRESSION;
+
+TERM:			      LITERAL_VALUE 
+			      | IDENTIFIER;
+EXPRESSION: 		      TERM 
+			      | EXPRESSION '+' EXPRESSION 
+			      | EXPRESSION '-' EXPRESSION
+			      | EXPRESSION '.' EXPRESSION
+			      | EXPRESSION '/' EXPRESSION
+			      | EXPRESSION '<' EXPRESSION
+			      | EXPRESSION '>' EXPRESSION
+			      | EXPRESSION '&' EXPRESSION
+			      | EXPRESSION '|' EXPRESSION
+			      | EXPRESSION '~' EXPRESSION
+			      | EXPRESSION OPERATOR_LE EXPRESSION
+			      | EXPRESSION OPERATOR_GE EXPRESSION
+			      | EXPRESSION OPERATOR_EQ EXPRESSION
+			      | EXPRESSION OPERATOR_DIF EXPRESSION
+			      | /*empty*/;
 
 VARIABLE_DEFINITION:          SINGLE_VARIABLE_DECLARATION
                               | ARRAY_DEFINITION;
@@ -65,6 +94,7 @@ LITERAL_VALUE:                LIT_INTEGER
                               | LIT_FLOAT
                               | LIT_CHAR
                               | LIT_STRING;
+
 
 
 %%
