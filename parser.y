@@ -32,7 +32,6 @@
 
 PROGRAM:                      GLOBAL_DEFINITION_LIST;
 GLOBAL_DEFINITION_LIST:       GLOBAL_DEFINITION  GLOBAL_DEFINITION_LIST
-                              | GLOBAL_DEFINITION
                               | /*empty*/ ;
 GLOBAL_DEFINITION:            FUNCTION_DEFINITION 
                               | VARIABLE_DEFINITION;
@@ -41,7 +40,6 @@ FUNCTION_DEFINITION:          FUNCTION_HEADER FUNCTION_BODY;
 FUNCTION_HEADER:              TYPE_KEYWORD IDENTIFIER '(' PARAMETER_LIST ')' 
 FUNCTION_BODY:                COMMAND_BLOCK:
 PARAMETER_LIST:               PARAMETER PARAMETER_LIST
-                              | PARAMETER
                               | /*empty*/;
 PARAMETER:                    TYPE_KEYWORD IDENTIFIER;
 COMMAND_BLOCK:                '{' COMMAND_LIST '}';
@@ -61,7 +59,6 @@ TYPE_KEYWORD:                 KW_CHAR
                               | KW_FLOAT;
 
 LITERAL_VALUE_LIST:           LITERAL_VALUE LITERAL_VALUE_LIST
-                              | LITERAL_VALUE 
                               | /*empty*/;
 
 LITERAL_VALUE:                LIT_INTEGER 
