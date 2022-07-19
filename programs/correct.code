@@ -24,9 +24,9 @@ int main ()
 ##  print a;
   i <- 2;
 ##
-##  print "Digite um numero: \n";
+  print "Digite um numero: \n";
 ##  read a;
-##  print "Digite mais um numero: \n";
+  print "Digite mais um numero: \n";
 ##  read v[a];
 ##
 ##  while (i<10)
@@ -35,12 +35,12 @@ int main ()
 ##    a <- incn(a a);
 ##    };
 ##
-##  print "Incrementado algumas vezes a fica " (2+x)a "\n";
+  print "Incrementado algumas vezes a fica " (2+x)a "\n";
 ##
 ##  if (a == 15)
 ##    {
 ##    a <- a + 1;
-##    print "A era=15\n";
+    print "A era=15\n";
 ##    };
 ##    
 ##  if (i==100)
@@ -48,7 +48,7 @@ int main ()
 ##    print "Nao tem como isso...\n"
 ##    }
 ##  else
-##    print "OK!\n"; {{}}
+    print "OK!\n"; {{}}
   }
 
 int incn (int x int n )

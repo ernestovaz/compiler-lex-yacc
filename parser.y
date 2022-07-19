@@ -54,14 +54,21 @@ COMMAND_LIST:                 COMMAND ';' COMMAND_LIST
 			      									| COMMAND ;
 COMMAND:		      						COMMAND_BLOCK	
 			 												| ASSIGNMENT_COMMAND
+															| PRINT_COMMAND
 			 												| /*empty*/;
 
 ASSIGNMENT_COMMAND: 	      	VARIABLE_IDENTIFIER ASSIGNMENT EXPRESSION;
+PRINT_COMMAND:								KW_PRINT PRINTABLE_ELEMENT_LIST;
+PRINTABLE_ELEMENT_LIST:				LIT_STRING PRINTABLE_ELEMENT_LIST
+															| EXPRESSION PRINTABLE_ELEMENT_LIST
+															| /*empty*/;
 
-TERM:			      							LITERAL_VALUE 
-			      									| VARIABLE_IDENTIFIER;
+EXPRESSION_TERM:			      	VARIABLE_IDENTIFIER
+							 								| LIT_INTEGER
+															| LIT_CHAR;
 
-EXPRESSION: 		      				TERM 
+EXPRESSION: 		      				EXPRESSION_TERM 
+															| '(' EXPRESSION ')'
 			      									| EXPRESSION '+' EXPRESSION 
 			      									| EXPRESSION '-' EXPRESSION
 			      									| EXPRESSION '.' EXPRESSION
