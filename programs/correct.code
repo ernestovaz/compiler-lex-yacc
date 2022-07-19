@@ -28,15 +28,15 @@ int main ()
   read a;
   print "Digite mais um numero: \n";
   read v[a];
-##
-##  while (i<10)
-##    {
+
+  while (i<10)
+    {
     i <- incn(i);
-##  a <- incn(a a);
-##    };
-##
+  a <- incn(a a);
+    };
+
   print "Incrementado algumas vezes a fica " (2+x)a "\n";
-##
+
 ##  if (a == 15)
 ##    {
 ##    a <- a + 1;
@@ -48,7 +48,7 @@ int main ()
 ##    print "Nao tem como isso...\n"
 ##    }
 ##  else
-    print "OK!\n"; {{}}
+##  print "OK!\n"; {{}}
   }
 
 int incn (int x int n )
