@@ -27,7 +27,7 @@ int main ()
   print "Digite um numero: \n";
 ##  read a;
   print "Digite mais um numero: \n";
-##  read v[a];
+  read v[a];
 ##
 ##  while (i<10)
 ##    {
