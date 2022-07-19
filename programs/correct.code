@@ -53,7 +53,7 @@ int main ()
 
 int incn (int x int n )
   {
-##  return x + n
+  return x + n
   }
 
 ## end of file
