@@ -77,7 +77,7 @@ return                    { return KW_RETURN; }
 <<EOF>>                   { running = 0; return 0; }
 
 <COMMENT>([^#\n]|#)       {} // ignore 
-<COMMENT>#\/              { BEGIN 0; } // end comment mode 
+<COMMENT>#\\              { BEGIN 0; } // end comment mode 
 
 %%
 
