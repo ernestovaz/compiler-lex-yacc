@@ -57,6 +57,8 @@ COMMAND:		      						COMMAND_BLOCK
 															| READ_COMMAND
 															| RETURN_COMMAND
 															| PRINT_COMMAND
+															| IF_COMMAND
+															| IF_ELSE_COMMAND
 															| WHILE_COMMAND
 			 												| /*empty*/;
 
@@ -68,6 +70,8 @@ PRINTABLE_ELEMENT_LIST:				LIT_STRING PRINTABLE_ELEMENT_LIST
 															| EXPRESSION PRINTABLE_ELEMENT_LIST
 															| /*empty*/;
 
+IF_COMMAND:										KW_IF '(' EXPRESSION ')' COMMAND;
+IF_ELSE_COMMAND:							KW_IF '(' EXPRESSION ')' COMMAND KW_ELSE COMMAND;
 WHILE_COMMAND:								KW_WHILE '(' EXPRESSION ')' COMMAND;
 
 EXPRESSION_TERM:			      	VARIABLE_IDENTIFIER

@@ -37,18 +37,18 @@ int main ()
 
   print "Incrementado algumas vezes a fica " (2+x)a "\n";
 
-##  if (a == 15)
-##    {
-##    a <- a + 1;
+  if (a == 15)
+    {
+    a <- a + 1;
     print "A era=15\n";
-##    };
-##    
-##  if (i==100)
-##    {
-##    print "Nao tem como isso...\n"
-##    }
-##  else
-##  print "OK!\n"; {{}}
+    };
+    
+  if (i==100)
+    {
+    print "Nao tem como isso...\n"
+    }
+  else
+  print "OK!\n"; {{}}
   }
 
 int incn (int x int n )
