@@ -51,8 +51,9 @@ PARAMETER_LIST:               PARAMETER PARAMETER_LIST
 PARAMETER:                    TYPE_KEYWORD IDENTIFIER;
 COMMAND_BLOCK:                '{' COMMAND_LIST '}';
 COMMAND_LIST:                 COMMAND ';' COMMAND_LIST
-			      									| /*empty*/;
-COMMAND:		      						ASSIGNMENT_COMMAND
+			      									| COMMAND ;
+COMMAND:		      						COMMAND_BLOCK	
+			 												| ASSIGNMENT_COMMAND
 			 												| /*empty*/;
 
 ASSIGNMENT_COMMAND: 	      	VARIABLE_IDENTIFIER ASSIGNMENT EXPRESSION;
