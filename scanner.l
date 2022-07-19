@@ -52,16 +52,16 @@ return                    { return KW_RETURN; }
 ==                        { return OPERATOR_EQ; }
 !=                        { return OPERATOR_DIF; }
 
-[A-Za-z_]+                { insert(hashTable, yytext, yytext); //identifiers
+[A-Za-z_]+                { insert(hashTable, yytext, TK_IDENTIFIER); //identifiers
                             return TK_IDENTIFIER; } 
 
-[0-9]+,[0-9]+             { insert(hashTable, yytext, yytext); //literals
+[0-9]+,[0-9]+             { insert(hashTable, yytext, LIT_FLOAT); //literals
                             return LIT_FLOAT; } 
-[0-9]+                    { insert(hashTable, yytext, yytext);
+[0-9]+                    { insert(hashTable, yytext, LIT_INTEGER);
                             return LIT_INTEGER; } 
-'([^\'\n\t]|\\'|\\n)'     { insert(hashTable, yytext, yytext); 
+'([^\'\n\t]|\\'|\\n)'     { insert(hashTable, yytext, LIT_CHAR); 
                             return LIT_CHAR; } 
-\"([^\"\n\t]|\\\"|\\n)+\"  { insert(hashTable, yytext, yytext); 
+\"([^\"\n\t]|\\\"|\\n)+\"  { insert(hashTable, yytext, LIT_STRING); 
                             return LIT_STRING; }
 
 ##.*                      {} // comment, ignore line

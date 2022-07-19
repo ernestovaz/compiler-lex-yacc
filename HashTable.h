@@ -5,7 +5,7 @@
 
 typedef struct hash_table_node {
     char* key;              
-    char* value;
+    int value;
     struct hash_table_node* next;
 } HashTableNode;
 
@@ -17,15 +17,15 @@ typedef struct hash_table {
 
 // External functions
 HashTable* createTable();
-void insert(HashTable* hashtable, char* key, char* value);
-char* search(HashTable* hashtable, char* key);
+void insert(HashTable* hashtable, char* key, int value);
+int search(HashTable* hashtable, char* key);
 void freeTable(HashTable* hashTable);
 void printSearch(HashTable* hashtable,  char* key);
 void printTable(HashTable* hashtable);
 
 //Internal functions
 int hashFunction( char* key);
-HashTableNode* createNode(char* key, char* value);
+HashTableNode* createNode(char* key, int value);
 void handleCollision(HashTableNode* position, HashTableNode* node);
 
 #endif
