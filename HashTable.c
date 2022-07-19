@@ -15,7 +15,7 @@ HashTable* createTable(){
     return hashtable;
 }
 
-void insert(HashTable* hashtable, char* key, char* value){
+void insert(HashTable* hashtable, char* key, int value){
     HashTableNode* node = createNode(key, value);
 
     int index = hashFunction(key);
@@ -34,7 +34,7 @@ void insert(HashTable* hashtable, char* key, char* value){
 
 }
 
-char* search(HashTable* hashtable, char* key){
+int search(HashTable* hashtable, char* key){
     int index = hashFunction(key);
     HashTableNode* node = hashtable->table[index];
 
@@ -42,12 +42,12 @@ char* search(HashTable* hashtable, char* key){
         if (strcmp(node->key, key) == 0){
             return node->value;
         } else if (node->next == NULL){
-            return NULL;
+            return -1;
         }
         node = node->next;
     }
 
-    return NULL;
+    return -1;
 }
 
 void freeTable(HashTable* hashTable) {
@@ -64,12 +64,12 @@ void freeTable(HashTable* hashTable) {
 }
 
 void printSearch(HashTable* hashTable, char* key){
-    const char* value = search(hashTable, key);
-    if (value == NULL){
+    const int value = search(hashTable, key);
+    if (value == -1){
         printf("%s does not exist\n", key);
         return;
     } else{
-        printf("Key:%s, Value:%s", key, value);
+        printf("Key:%s, Value:%d", key, value);
     }
 }
 
@@ -79,13 +79,13 @@ void printTable(HashTable* hashTable){
     for (int i=0; i<hashTable->size; i++) {
         node = hashTable->table[i];
         if (node != NULL) {
-            printf("Index:%d, Key:%s, Value:%s", 
+            printf("Index:%d, Key:%s, Value:%d", 
                     i, 
                     hashTable->table[i]->key, 
                     hashTable->table[i]->value);
             node = node->next;
             while(node != NULL) {
-                printf(" => Key:%s, Value:%s ", 
+                printf(" => Key:%s, Value:%d ", 
                         node->key, 
                         node->value);
                 node = node->next;
@@ -105,19 +105,18 @@ int hashFunction(char* key){
     return sum;
 }
 
-HashTableNode* createNode(char* key, char* value) {
+HashTableNode* createNode(char* key, int value) {
     HashTableNode* node = malloc(sizeof(HashTableNode));
     node->key = (char*) malloc (strlen(key) + 1);
-    node->value = (char*) malloc (strlen(value) + 1);
+    node->value = value;
     strcpy(node->key, key);
-    strcpy(node->value, value);
     return node;
 }
 
 void handleCollision(HashTableNode* position, HashTableNode* node){
     while(position != NULL){
         if (strcmp(position->key, node->key) == 0){
-            strcpy(position->value, node->value);
+            position->value = node->value;
             return;
         } 
         if (position->next == NULL) {
