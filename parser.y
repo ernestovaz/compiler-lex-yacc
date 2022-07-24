@@ -38,92 +38,98 @@
 
 %%
 
-PROGRAM:                      GLOBAL_DEFINITION_LIST;
-GLOBAL_DEFINITION_LIST:       GLOBAL_DEFINITION  GLOBAL_DEFINITION_LIST
-                              | /*empty*/ ;
-GLOBAL_DEFINITION:            FUNCTION_DEFINITION 
-                              | VARIABLE_DEFINITION;
+program:          		definition_list;
+definition_list: 			definition definition_list
+                  		| /*empty*/ 
+											;
 
-FUNCTION_DEFINITION:          FUNCTION_HEADER COMMAND_BLOCK;
-FUNCTION_HEADER:              TYPE_KEYWORD IDENTIFIER '(' PARAMETER_LIST ')' 
-PARAMETER_LIST:               PARAMETER PARAMETER_LIST
-                              | /*empty*/;
-PARAMETER:                    TYPE_KEYWORD IDENTIFIER;
-COMMAND_BLOCK:                '{' COMMAND_LIST '}';
-COMMAND_LIST:                 COMMAND ';' COMMAND_LIST
-			      									| COMMAND ;
-COMMAND:		      						COMMAND_BLOCK	
-			 												| ASSIGNMENT_COMMAND
-															| READ_COMMAND
-															| RETURN_COMMAND
-															| PRINT_COMMAND
-															| IF_COMMAND
-															| IF_ELSE_COMMAND
-															| WHILE_COMMAND
-			 												| /*empty*/;
+definition:       		function_definition 
+                  		| variable_definition 
+											;
 
-ASSIGNMENT_COMMAND: 	      	VARIABLE_IDENTIFIER ASSIGNMENT EXPRESSION;
-READ_COMMAND:									KW_READ VARIABLE_IDENTIFIER;
-RETURN_COMMAND:								KW_RETURN EXPRESSION;
-PRINT_COMMAND:								KW_PRINT PRINTABLE_ELEMENT_LIST;
-PRINTABLE_ELEMENT_LIST:				LIT_STRING PRINTABLE_ELEMENT_LIST
-															| EXPRESSION PRINTABLE_ELEMENT_LIST
-															| /*empty*/;
+function_definition:	type TK_IDENTIFIER '(' parameter_list ')' command_block;
+parameter_list:       type TK_IDENTIFIER parameter_list
+											| /*empty*/
+											;
+command_block:				'{' command_list '}';
+command_list:					command ';' command_list
+											| command 
+											;
+command:							command_block	
+											| assignment
+											| read
+											| return
+											| print
+											| if
+											| if_else
+											| while
+											| /*empty*/
+											;
 
-IF_COMMAND:										KW_IF '(' EXPRESSION ')' COMMAND;
-IF_ELSE_COMMAND:							KW_IF '(' EXPRESSION ')' COMMAND KW_ELSE COMMAND;
-WHILE_COMMAND:								KW_WHILE '(' EXPRESSION ')' COMMAND;
+assignment: 	      	variable ASSIGNMENT expression;
+read:									KW_READ variable;
+return:								KW_RETURN expression;
+if:										KW_IF '(' expression ')' command;
+if_else:							KW_IF '(' expression ')' command KW_ELSE command;
+while:								KW_WHILE '(' expression ')' command;
+print:								KW_PRINT print_element_list;
+print_element_list:		LIT_STRING print_element_list
+											| expression print_element_list
+											| /*empty*/
+											;
 
-EXPRESSION_TERM:			      	VARIABLE_IDENTIFIER
-							 								| LIT_INTEGER
-															| LIT_FLOAT
-															| LIT_CHAR;
+expression: 		      expression_term
+											| '(' expression ')'
+											| '~' expression
+											| expression '+' expression 
+											| expression '-' expression
+											| expression '.' expression
+											| expression '/' expression
+											| expression '<' expression
+											| expression '>' expression
+											| expression '&' expression
+											| expression '|' expression
+											| expression OPERATOR_LE  expression
+											| expression OPERATOR_GE  expression
+											| expression OPERATOR_EQ  expression
+											| expression OPERATOR_DIF expression
+											| function_call
+											;
 
-EXPRESSION: 		      				EXPRESSION_TERM 
-															| '(' EXPRESSION ')'
-			      									| EXPRESSION '+' EXPRESSION 
-			      									| EXPRESSION '-' EXPRESSION
-			      									| EXPRESSION '.' EXPRESSION
-			      									| EXPRESSION '/' EXPRESSION
-			      									| EXPRESSION '<' EXPRESSION
-			      									| EXPRESSION '>' EXPRESSION
-			      									| EXPRESSION '&' EXPRESSION
-			      									| EXPRESSION '|' EXPRESSION
-			      									| '~' EXPRESSION
-			      									| EXPRESSION OPERATOR_LE EXPRESSION
-			      									| EXPRESSION OPERATOR_GE EXPRESSION
-			      									| EXPRESSION OPERATOR_EQ EXPRESSION
-			      									| EXPRESSION OPERATOR_DIF EXPRESSION
-															| FUNCTION_CALL;
-
-FUNCTION_CALL:								IDENTIFIER '(' EXPRESSION_LIST ')';
-EXPRESSION_LIST:							EXPRESSION EXPRESSION_LIST
-							 								| /*empty*/;
-
-VARIABLE_DEFINITION:          SINGLE_VARIABLE_DECLARATION
-                              | ARRAY_DEFINITION;
-SINGLE_VARIABLE_DECLARATION:  TYPE_KEYWORD IDENTIFIER '(' LITERAL_VALUE ')' ';';
-ARRAY_DEFINITION:             TYPE_KEYWORD IDENTIFIER '[' ARRAY_SIZE_VALUE ']' LITERAL_VALUE_LIST ';'
-ARRAY_SIZE_VALUE:             LIT_INTEGER;
+expression_term:			variable
+											| LIT_INTEGER
+											| LIT_FLOAT
+											| LIT_CHAR
+											;
 
 
-VARIABLE_IDENTIFIER:					IDENTIFIER 
-									 						| IDENTIFIER '[' EXPRESSION ']'
+function_call:				TK_IDENTIFIER '(' expression_list ')';
+expression_list:			expression expression_list
+											| /*empty*/
+											;
 
-IDENTIFIER:                   TK_IDENTIFIER;
-TYPE_KEYWORD:                 KW_CHAR 
-                              | KW_INT
-                              | KW_FLOAT;
+variable_definition:	type TK_IDENTIFIER '(' literal ')' ';'
+									 		| type TK_IDENTIFIER '[' LIT_INTEGER ']' literal_list ';'
+											;
 
-LITERAL_VALUE_LIST:           LITERAL_VALUE LITERAL_VALUE_LIST
-                              | /*empty*/;
+variable:							TK_IDENTIFIER 
+											| TK_IDENTIFIER '[' expression ']'
+											;
 
-LITERAL_VALUE:                LIT_INTEGER 
-                              | LIT_FLOAT
-                              | LIT_CHAR
-                              | LIT_STRING;
+type:									KW_CHAR 
+											| KW_INT
+											| KW_FLOAT
+											;
 
+literal:							LIT_INTEGER 
+											| LIT_FLOAT
+											| LIT_CHAR
+											| LIT_STRING
+											;
 
+literal_list:					literal literal_list
+                      | /*empty*/
+											;
 
 %%
 
