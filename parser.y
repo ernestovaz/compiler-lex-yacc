@@ -38,25 +38,25 @@
 
 %%
 
-program:          		definition_list;
-			 								definition_list: 			definition definition_list
+program:							definition_list;
+definition_list:			definition definition_list
 											| /*empty*/ 
 											;
 
-definition:       		function_definition 
+definition:						function_definition 
 											| variable_definition 
 											;
 
 function_definition:	type TK_IDENTIFIER '(' parameter_list ')' command_block;
-									 		parameter_list:       type TK_IDENTIFIER parameter_list
+											parameter_list:       type TK_IDENTIFIER parameter_list
 											| /*empty*/
 											;
 command_block:				'{' command_list '}';
-						 					command_list:					command ';' command_list
+											command_list:					command ';' command_list
 											| command 
 											;
 command:							command_block	
-			 								| assignment
+											| assignment
 											| read
 											| return
 											| print
@@ -66,7 +66,7 @@ command:							command_block
 											| /*empty*/
 											;
 
-assignment: 	      	variable ASSIGNMENT expression;
+assignment:						variable ASSIGNMENT expression;
 read:									KW_READ variable;
 return:								KW_RETURN expression;
 if:										KW_IF '(' expression ')' command;
@@ -78,7 +78,7 @@ print_element_list:		LIT_STRING print_element_list
 											| /*empty*/
 											;
 
-expression: 		      expression_term
+expression:						expression_term
 											| '(' expression ')'
 											| '~' expression
 											| expression '+' expression 
@@ -97,7 +97,7 @@ expression: 		      expression_term
 											;
 
 expression_term:			variable
-							 				| LIT_INTEGER
+											| LIT_INTEGER
 											| LIT_FLOAT
 											| LIT_CHAR
 											;
@@ -109,7 +109,7 @@ expression_list:			expression expression_list
 											;
 
 variable_definition:	type TK_IDENTIFIER '(' literal ')' ';'
-									 		| type TK_IDENTIFIER '[' LIT_INTEGER ']' literal_list ';'
+											| type TK_IDENTIFIER '[' LIT_INTEGER ']' literal_list ';'
 											;
 
 variable:							TK_IDENTIFIER 
@@ -122,7 +122,7 @@ type:									KW_CHAR
 											;
 
 literal:							LIT_INTEGER 
-			 								| LIT_FLOAT
+											| LIT_FLOAT
 											| LIT_CHAR
 											| LIT_STRING
 											;
