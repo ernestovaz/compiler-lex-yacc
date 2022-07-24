@@ -33,30 +33,30 @@
 %right '~'
 
 %{
-  int yyerror(char* s);
+	int yyerror(char* s);
 %}
 
 %%
 
 program:          		definition_list;
-definition_list: 			definition definition_list
-                  		| /*empty*/ 
+			 								definition_list: 			definition definition_list
+											| /*empty*/ 
 											;
 
 definition:       		function_definition 
-                  		| variable_definition 
+											| variable_definition 
 											;
 
 function_definition:	type TK_IDENTIFIER '(' parameter_list ')' command_block;
-parameter_list:       type TK_IDENTIFIER parameter_list
+									 		parameter_list:       type TK_IDENTIFIER parameter_list
 											| /*empty*/
 											;
 command_block:				'{' command_list '}';
-command_list:					command ';' command_list
+						 					command_list:					command ';' command_list
 											| command 
 											;
 command:							command_block	
-											| assignment
+			 								| assignment
 											| read
 											| return
 											| print
@@ -97,7 +97,7 @@ expression: 		      expression_term
 											;
 
 expression_term:			variable
-											| LIT_INTEGER
+							 				| LIT_INTEGER
 											| LIT_FLOAT
 											| LIT_CHAR
 											;
@@ -122,18 +122,18 @@ type:									KW_CHAR
 											;
 
 literal:							LIT_INTEGER 
-											| LIT_FLOAT
+			 								| LIT_FLOAT
 											| LIT_CHAR
 											| LIT_STRING
 											;
 
 literal_list:					literal literal_list
-                      | /*empty*/
+											| /*empty*/
 											;
 
 %%
 
 int yyerror(char* s) {
-    fprintf(stderr, "Syntax error at line %d\n", lineNumber);
-    exit(3);
+		fprintf(stderr, "Syntax error at line %d\n", lineNumber);
+		exit(3);
 }
