@@ -1,11 +1,11 @@
 %{
 
 #include "y.tab.h"
-#include "HashTable.h"
+#include "SymbolTable.h"
 
 int running  = 1;
 int lineNumber = 1;
-HashTable* hashTable = NULL;
+SymbolTable* symbolTable = NULL;
 FILE* yyin;
 
 int getLineNumber(void) {
@@ -17,7 +17,7 @@ int isRunning(void) {
 }
 
 void initMe(void) {
-  hashTable = createTable();
+  symbolTable = createSymbolTable();
 }
   
 %}
@@ -52,16 +52,16 @@ return                    { return KW_RETURN; }
 ==                        { return OPERATOR_EQ; }
 !=                        { return OPERATOR_DIF; }
 
-[A-Za-z_]+                { insert(hashTable, yytext, TK_IDENTIFIER); //identifiers
+[A-Za-z_]+                { insertSymbol(symbolTable, yytext, SymbolIdentifier); //identifiers
                             return TK_IDENTIFIER; } 
 
-[0-9]+,[0-9]+             { insert(hashTable, yytext, LIT_FLOAT); //literals
+[0-9]+,[0-9]+             { insertSymbol(symbolTable, yytext, SymbolFloatLiteral); //literals
                             return LIT_FLOAT; } 
-[0-9]+                    { insert(hashTable, yytext, LIT_INTEGER);
+[0-9]+                    { insertSymbol(symbolTable, yytext, SymbolIntLiteral);
                             return LIT_INTEGER; } 
-'([^\'\n\t]|\\'|\\n)'     { insert(hashTable, yytext, LIT_CHAR); 
+'([^\'\n\t]|\\'|\\n)'     { insertSymbol(symbolTable, yytext, SymbolCharLiteral); 
                             return LIT_CHAR; } 
-\"([^\"\n\t]|\\\"|\\n)+\"  { insert(hashTable, yytext, LIT_STRING); 
+\"([^\"\n\t]|\\\"|\\n)+\"  { insertSymbol(symbolTable, yytext, SymbolStringLiteral); 
                             return LIT_STRING; }
 
 ##.*                      {} // comment, ignore line
@@ -82,6 +82,7 @@ return                    { return KW_RETURN; }
 %%
 
 int yywrap(void) {
+  printSymbolTable(symbolTable);
   return 1;
 }
 

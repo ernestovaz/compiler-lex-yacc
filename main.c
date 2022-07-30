@@ -1,7 +1,5 @@
 #define MAX_ASCII_CHAR_CODE 127
 
-#include "HashTable.h"
-
 char* get_token_name(int char_code){
   switch(char_code){
     case 256:

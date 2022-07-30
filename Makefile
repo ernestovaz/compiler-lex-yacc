@@ -1,7 +1,7 @@
 .PHONY: run
 
 etapa2: y.tab.c lex.yy.c
-		gcc -o etapa2 lex.yy.c HashTable.c
+		gcc -o etapa2 lex.yy.c SymbolTable.c
 
 y.tab.c: parser.y
 	yacc -d parser.y
