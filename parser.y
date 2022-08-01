@@ -1,3 +1,14 @@
+%{
+  #include "AbstractSyntaxTree.h"
+  #include "Symbol.h"
+  int yyerror(char* s);
+%}
+
+%union{
+    Symbol* symbol;
+    SyntaxTreeNode* syntaxNode;
+}
+
 %token KW_CHAR           
 %token KW_INT            
 %token KW_FLOAT          
@@ -17,10 +28,10 @@
 
 %token TK_IDENTIFIER     
 
-%token LIT_INTEGER       
-%token LIT_FLOAT         
-%token LIT_CHAR          
-%token LIT_STRING        
+%token<symbol> LIT_INTEGER       
+%token<symbol> LIT_FLOAT         
+%token<symbol> LIT_CHAR          
+%token<symbol> LIT_STRING        
 
 %token TOKEN_ERROR
 
@@ -32,9 +43,8 @@
 %left '.' '/'
 %right '~'
 
-%{
-  int yyerror(char* s);
-%}
+%type<syntaxNode> expression_term
+%type<syntaxNode> variable
 
 %%
 
@@ -78,7 +88,7 @@ print_element_list:   LIT_STRING print_element_list
                       | /*empty*/
                       ;
 
-expression:           expression_term
+expression:           expression_term   {printAST($1);}
                       | '(' expression ')'
                       | '~' expression
                       | expression '+' expression 
@@ -96,10 +106,10 @@ expression:           expression_term
                       | function_call
                       ;
 
-expression_term:      variable
-                      | LIT_INTEGER
-                      | LIT_FLOAT
-                      | LIT_CHAR
+expression_term:      variable      {$$=NULL;}
+                      | LIT_INTEGER {$$=createAST(SymbolNode, $1, 0, NULL, NULL, NULL, NULL);}
+                      | LIT_FLOAT   {$$=createAST(SymbolNode, $1, 0, NULL, NULL, NULL, NULL);}
+                      | LIT_CHAR    {$$=createAST(SymbolNode, $1, 0, NULL, NULL, NULL, NULL);}
                       ;
 
 

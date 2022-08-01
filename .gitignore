@@ -1,5 +1,6 @@
 etapa1
 etapa2 
+etapa3
 lex.yy.c
 y.tab.c
 y.output

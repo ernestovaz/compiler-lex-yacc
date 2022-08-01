@@ -1,7 +1,9 @@
 %{
 
-#include "y.tab.h"
+#include "Symbol.h"
 #include "SymbolTable.h"
+#include "AbstractSyntaxTree.h"
+#include "y.tab.h"
 
 int running  = 1;
 int lineNumber = 1;
@@ -52,16 +54,24 @@ return                    { return KW_RETURN; }
 ==                        { return OPERATOR_EQ; }
 !=                        { return OPERATOR_DIF; }
 
-[A-Za-z_]+                { insertSymbol(symbolTable, yytext, SymbolIdentifier); //identifiers
+[A-Za-z_]+                { Symbol* symbol = insertSymbol(symbolTable, yytext, SymbolIdentifier); //identifiers
+                            yylval.symbol = symbol;
                             return TK_IDENTIFIER; } 
 
-[0-9]+,[0-9]+             { insertSymbol(symbolTable, yytext, SymbolFloatLiteral); //literals
+[0-9]+,[0-9]+             { Symbol* symbol = insertSymbol(symbolTable, yytext, SymbolFloatLiteral); //literals
+                            yylval.symbol = symbol;
                             return LIT_FLOAT; } 
-[0-9]+                    { insertSymbol(symbolTable, yytext, SymbolIntLiteral);
+
+[0-9]+                    { Symbol* symbol = insertSymbol(symbolTable, yytext, SymbolIntLiteral);
+                            yylval.symbol = symbol;
                             return LIT_INTEGER; } 
-'([^\'\n\t]|\\'|\\n)'     { insertSymbol(symbolTable, yytext, SymbolCharLiteral); 
+
+'([^\'\n\t]|\\'|\\n)'     { Symbol* symbol = insertSymbol(symbolTable, yytext, SymbolCharLiteral); 
+                            yylval.symbol = symbol;
                             return LIT_CHAR; } 
-\"([^\"\n\t]|\\\"|\\n)+\"  { insertSymbol(symbolTable, yytext, SymbolStringLiteral); 
+
+\"([^\"\n\t]|\\\"|\\n)+\"  { Symbol* symbol = insertSymbol(symbolTable, yytext, SymbolStringLiteral); 
+                            yylval.symbol = symbol;
                             return LIT_STRING; }
 
 ##.*                      {} // comment, ignore line
