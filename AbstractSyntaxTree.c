@@ -32,11 +32,14 @@ SyntaxTreeNode* createAST(SyntaxNodeType type, Symbol* symbol, int level,
 }
 
 void printAST(SyntaxTreeNode* node) {
-    fprintf(stderr, _nodeTypeName(node->type));
-    if(node->symbol != NULL) fprintf(stderr, "%s", node->symbol->name);
-    fprintf(stderr, "\n");
-    for(int i=0; i<4; i++){
-        SyntaxTreeNode* child = node->children[i];
-        if(child != NULL) printAST(child);
+    if(node != NULL) {
+        fprintf(stderr, _nodeTypeName(node->type));
+        fprintf(stderr, " ");
+        if(node->symbol != NULL) fprintf(stderr, "%s", node->symbol->name);
+        fprintf(stderr, "\n");
+        for(int i=0; i<4; i++){
+            SyntaxTreeNode* child = node->children[i];
+            printAST(child);
+        }
     }
 }

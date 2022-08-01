@@ -16,9 +16,9 @@ of multiple lines
 
 int main ()
   {
-  a <- 0;
+  a <- 'c';
   a <- a - i;
-  a <- 5;
+  a <- 5,4;
   v[a] <- 55;
   print v[5];
   print a;
