@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 typedef enum syntax_node_type{
+    ParenthesesNode,
     AddNode,
     SubNode,
     DivNode,
@@ -21,6 +22,7 @@ typedef enum syntax_node_type{
     SymbolNode,
     VariableNode,
     VariableDefNode,
+    ArrayDefNode,
     ArrayNode,
     FunctionNode,
     ExpressionListNode,
@@ -35,7 +37,9 @@ typedef enum syntax_node_type{
     CommandListNode,
     CommandBlockNode,
     LiteralListNode,
-    TypeNode,
+    IntTypeNode,
+    FloatTypeNode,
+    CharTypeNode,
     FunctionDefNode,
     DefinitionListNode,
     ParameterListNode,
@@ -59,10 +63,13 @@ SyntaxTreeNode* createAST(
 void printAST(SyntaxTreeNode* node, int level);
 void decompileAST(SyntaxTreeNode* node, char* filename);
 
+void _decompileProgram(SyntaxTreeNode* node, FILE* file);
+
 void _decompileExpression(SyntaxTreeNode* node, FILE* file);
 void _decompileExpressionList(SyntaxTreeNode* node, FILE* file);
 
 void _decompileSymbol(SyntaxTreeNode* node, FILE* file);
+void _decompileArray(SyntaxTreeNode* node, FILE* file);
 
 // expressions
 void _decompileAdd(SyntaxTreeNode* node, FILE* file);
@@ -80,6 +87,23 @@ void _decompileEqual(SyntaxTreeNode* node, FILE* file);
 void _decompileDifferent(SyntaxTreeNode* node, FILE* file);
 void _decompileFunction(SyntaxTreeNode* node, FILE* file);
 
-void _decompileArray(SyntaxTreeNode* node, FILE* file);
 
-void _decompileProgram(SyntaxTreeNode* node, FILE* file);
+
+void _decompileType(SyntaxTreeNode* node, FILE* file);
+void _decompileVariableDef(SyntaxTreeNode* node, FILE* file);
+void _decompileArrayDef(SyntaxTreeNode* node, FILE* file);
+void _decompileLiteralList(SyntaxTreeNode* node, FILE* file);
+void _decompileAssignment(SyntaxTreeNode* node, FILE* file);
+void _decompileRead(SyntaxTreeNode* node, FILE* file);
+void _decompileReturn(SyntaxTreeNode* node, FILE* file);
+void _decompileIf(SyntaxTreeNode* node, FILE* file);
+void _decompileIfElse(SyntaxTreeNode* node, FILE* file);
+void _decompileWhile(SyntaxTreeNode* node, FILE* file);
+void _decompilePrint(SyntaxTreeNode* node, FILE* file);
+void _decompilePrintList(SyntaxTreeNode* node, FILE* file);
+void _decompileCommand(SyntaxTreeNode* node, FILE* file);
+void _decompileCommandList(SyntaxTreeNode* node, FILE* file);
+void _decompileCommandBlock(SyntaxTreeNode* node, FILE* file);
+void _decompileFunctionDef(SyntaxTreeNode* node, FILE* file);
+void _decompileDefinition(SyntaxTreeNode* node, FILE* file);
+void _decompileDefinitionList(SyntaxTreeNode* node, FILE* file);

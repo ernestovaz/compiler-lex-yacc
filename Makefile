@@ -17,7 +17,4 @@ run: etapa3
 		./etapa3
 
 test: etapa3
-		@echo 
-		./etapa3 programs/correct.code || true
-		@echo 
-		./etapa3 programs/incorrect.code || true
+		./etapa3 programs/correct.code

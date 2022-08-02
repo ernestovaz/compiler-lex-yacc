@@ -2,6 +2,7 @@
   #include "AbstractSyntaxTree.h"
   #include "Symbol.h"
   int yyerror(char* s);
+  char* filename = "output.txt";
 %}
 
 %union{
@@ -71,7 +72,7 @@
 
 %%
 
-program:              definition_list {printAST($1, 0);}
+program:              definition_list {printAST($1, 0); decompileAST($1, filenamne);}
                       ;
 definition_list:      definition definition_list {$$=createAST(DefinitionListNode, NULL, $1, $2, NULL, NULL);}
                       | /*empty*/ {$$=NULL;}
@@ -81,6 +82,9 @@ definition:           function_definition {$$=$1;}
                       | variable_definition {$$=$1;}
                       ;
 
+variable_definition:  type TK_IDENTIFIER '(' literal ')' ';' {$$=createAST(VariableDefNode, $2, $1, $4, NULL, NULL);}
+                      | type TK_IDENTIFIER '[' integer ']' literal_list ';' {$$=createAST(ArrayDefNode, $2, $1, $4, $6, NULL);}
+                      ;
 function_definition:  type TK_IDENTIFIER '(' parameter_list ')' command_block {$$=createAST(FunctionDefNode, $2, $1, $4, $6, NULL);}
                       ;
 parameter_list:       type TK_IDENTIFIER parameter_list {$$=createAST(ParameterListNode, $2, $1, $3, NULL, NULL);}
@@ -116,13 +120,13 @@ while:                KW_WHILE '(' expression ')' command {$$=createAST(WhileNod
                       ;
 print:                KW_PRINT print_element_list {$$=createAST(PrintNode, NULL, $2, NULL, NULL, NULL);}
                       ;
-print_element_list:   LIT_STRING print_element_list {$$=createAST(PrintListNode, $1, $2, NULL, NULL, NULL);}
+print_element_list:   LIT_STRING print_element_list {$$=createAST(PrintListNode, $1, NULL, $2, NULL, NULL);}
                       | expression print_element_list {$$=createAST(PrintListNode, NULL, $1, $2, NULL, NULL);}
                       | /*empty*/ {$$=NULL;}
                       ;
 
 expression:           expression_term                       {$$=$1;}
-                      | '(' expression ')'                  {$$=$2;}
+                      | '(' expression ')'                  {$$=createAST(ParenthesesNode, NULL, $2, NULL, NULL, NULL);}
                       | '~' expression                      {$$=createAST(NegationNode, NULL, $2, NULL, NULL, NULL);}
                       | expression '+' expression           {$$=createAST(AddNode, NULL, $1, $3, NULL, NULL);}
                       | expression '-' expression           {$$=createAST(SubNode, NULL, $1, $3, NULL, NULL);}
@@ -136,7 +140,7 @@ expression:           expression_term                       {$$=$1;}
                       | expression OPERATOR_GE  expression  {$$=createAST(GreaterEqualNode, NULL, $1, $3, NULL, NULL);}
                       | expression OPERATOR_EQ  expression  {$$=createAST(EqualNode, NULL, $1, $3, NULL, NULL);}
                       | expression OPERATOR_DIF expression  {$$=createAST(DifferentNode, NULL, $1, $3, NULL, NULL);}
-                      | function_call                       {$$=$1;}
+                      | function_call                       {$$=$1; }
                       ;
 
 expression_term:      variable      {$$=$1;}
@@ -152,18 +156,15 @@ expression_list:      expression expression_list {$$=createAST(ExpressionListNod
                       | /*empty*/ {$$=NULL;}
                       ;
 
-variable_definition:  type TK_IDENTIFIER '(' literal ')' ';' {$$=createAST(VariableDefNode, $2, $1, $4, NULL, NULL);}
-                      | type TK_IDENTIFIER '[' integer ']' literal_list ';' {$$=createAST(VariableDefNode, $2, $1, $4, $6, NULL);}
-                      ;
 integer:              LIT_INTEGER {$$=createAST(SymbolNode, $1, NULL, NULL, NULL, NULL);}
                       ;
 variable:             TK_IDENTIFIER {$$=createAST(VariableNode, $1, NULL, NULL, NULL, NULL);}
                       | TK_IDENTIFIER '[' expression ']' {$$=createAST(ArrayNode, $1, $3, NULL, NULL, NULL);}
                       ;
 
-type:                 KW_CHAR {$$=createAST(TypeNode, NULL, NULL, NULL, NULL, NULL);}
-                      | KW_INT {$$=createAST(TypeNode, NULL, NULL, NULL, NULL, NULL);}
-                      | KW_FLOAT {$$=createAST(TypeNode, NULL, NULL, NULL, NULL, NULL);}
+type:                 KW_CHAR {$$=createAST(CharTypeNode, NULL, NULL, NULL, NULL, NULL);}
+                      | KW_INT {$$=createAST(IntTypeNode, NULL, NULL, NULL, NULL, NULL);}
+                      | KW_FLOAT {$$=createAST(FloatTypeNode, NULL, NULL, NULL, NULL, NULL);}
                       ;
 
 literal:              LIT_INTEGER {$$=createAST(SymbolNode, $1, NULL, NULL, NULL, NULL);}
