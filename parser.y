@@ -48,6 +48,8 @@
 %type<syntaxNode> function_call
 %type<syntaxNode> expression_list
 %type<syntaxNode> assignment
+%type<syntaxNode> read
+%type<syntaxNode> return
 
 %%
 
@@ -81,8 +83,10 @@ command:              command_block
 
 assignment:           variable ASSIGNMENT expression     {$$=createAST(AssignmentNode, NULL, $1, $3, NULL, NULL);}
                       ;
-read:                 KW_READ variable;
-return:               KW_RETURN expression;
+read:                 KW_READ variable {$$=createAST(ReadNode, NULL, $2, NULL, NULL, NULL);}
+                      ;
+return:               KW_RETURN expression {$$=createAST(ReturnNode, NULL, $2, NULL, NULL, NULL);}
+                      ;
 if:                   KW_IF '(' expression ')' command;
 if_else:              KW_IF '(' expression ')' command KW_ELSE command;
 while:                KW_WHILE '(' expression ')' command;

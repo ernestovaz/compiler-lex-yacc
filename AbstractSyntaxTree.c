@@ -41,6 +41,10 @@ char* _nodeTypeName(SyntaxNodeType type) {
             return "LIST";
         case AssignmentNode:
             return "ASSIGNMENT";
+        case ReadNode:
+            return "READ";
+        case ReturnNode:
+            return "RETURN";
     }
     return "ERROR";
 }

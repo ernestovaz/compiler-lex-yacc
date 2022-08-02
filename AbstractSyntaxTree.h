@@ -22,6 +22,8 @@ typedef enum syntax_node_type{
     FunctionNode,
     ListNode,
     AssignmentNode,
+    ReadNode,
+    ReturnNode,
 }SyntaxNodeType;
 
 typedef struct syntax_tree_node {
