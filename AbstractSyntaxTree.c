@@ -39,6 +39,8 @@ char* _nodeTypeName(SyntaxNodeType type) {
             return "FUNCTION";
         case ListNode:
             return "LIST";
+        case AssignmentNode:
+            return "ASSIGNMENT";
     }
     return "ERROR";
 }

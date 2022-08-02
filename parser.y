@@ -27,7 +27,6 @@
 %token OPERATOR_DIF      
 
 %token<symbol> TK_IDENTIFIER     
-
 %token<symbol> LIT_INTEGER       
 %token<symbol> LIT_FLOAT         
 %token<symbol> LIT_CHAR          
@@ -48,6 +47,7 @@
 %type<syntaxNode> variable
 %type<syntaxNode> function_call
 %type<syntaxNode> expression_list
+%type<syntaxNode> assignment
 
 %%
 
@@ -69,7 +69,7 @@ command_list:         command ';' command_list
                       | command
                       ;
 command:              command_block
-                      | assignment
+                      | assignment {printAST($1, 0);}
                       | read
                       | return
                       | print
@@ -79,7 +79,7 @@ command:              command_block
                       | /*empty*/
                       ;
 
-assignment:           variable ASSIGNMENT expression     {printAST($3,0);}
+assignment:           variable ASSIGNMENT expression     {$$=createAST(AssignmentNode, NULL, $1, $3, NULL, NULL);}
                       ;
 read:                 KW_READ variable;
 return:               KW_RETURN expression;
