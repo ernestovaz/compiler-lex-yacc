@@ -46,6 +46,8 @@
 %type<syntaxNode> expression
 %type<syntaxNode> expression_term
 %type<syntaxNode> variable
+%type<syntaxNode> function_call
+%type<syntaxNode> expression_list
 
 %%
 
@@ -105,7 +107,7 @@ expression:           expression_term                       {$$=$1;}
                       | expression OPERATOR_GE  expression  {$$=createAST(GreaterEqualNode, NULL, $1, $3, NULL, NULL);}
                       | expression OPERATOR_EQ  expression  {$$=createAST(EqualNode, NULL, $1, $3, NULL, NULL);}
                       | expression OPERATOR_DIF expression  {$$=createAST(DifferentNode, NULL, $1, $3, NULL, NULL);}
-                      | function_call                       {$$=NULL; /*TODO: IMPLEMENT*/}
+                      | function_call                       {$$=$1;}
                       ;
 
 expression_term:      variable      {$$=$1;}
@@ -115,9 +117,10 @@ expression_term:      variable      {$$=$1;}
                       ;
 
 
-function_call:        TK_IDENTIFIER '(' expression_list ')';
-expression_list:      expression expression_list
-                      | /*empty*/
+function_call:        TK_IDENTIFIER '(' expression_list ')' {$$=createAST(FunctionNode, $1, $3, NULL, NULL, NULL);}
+                      ;
+expression_list:      expression expression_list {$$=createAST(ListNode, NULL, $1, $2, NULL, NULL);}
+                      | /*empty*/ {$$=NULL;}
                       ;
 
 variable_definition:  type TK_IDENTIFIER '(' literal ')' ';'
@@ -125,7 +128,7 @@ variable_definition:  type TK_IDENTIFIER '(' literal ')' ';'
                       ;
 
 variable:             TK_IDENTIFIER {$$=createAST(VariableNode, $1, NULL, NULL, NULL, NULL);}
-                      | TK_IDENTIFIER '[' expression ']' {$$=createAST(IndexNode, $1, $3, NULL, NULL, NULL);}
+                      | TK_IDENTIFIER '[' expression ']' {$$=createAST(ArrayNode, $1, $3, NULL, NULL, NULL);}
                       ;
 
 type:                 KW_CHAR 

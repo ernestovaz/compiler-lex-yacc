@@ -33,8 +33,12 @@ char* _nodeTypeName(SyntaxNodeType type) {
             return "SYMBOL";
         case VariableNode:
             return "VARIABLE";
-        case IndexNode:
-            return "INDEX";
+        case ArrayNode:
+            return "ARRAY";
+        case FunctionNode:
+            return "FUNCTION";
+        case ListNode:
+            return "LIST";
     }
     return "ERROR";
 }
@@ -54,7 +58,7 @@ SyntaxTreeNode* createAST(SyntaxNodeType type, Symbol* symbol,
 
 void printAST(SyntaxTreeNode* node, int level) {
     if(node != NULL) {
-        for(int i=0; i<level; i++) fprintf(stderr,"|");
+        for(int i=0; i<level; i++) fprintf(stderr," |");
         if(level>0) fprintf(stderr, "_");
         fprintf(stderr, _nodeTypeName(node->type));
         fprintf(stderr, " ");
