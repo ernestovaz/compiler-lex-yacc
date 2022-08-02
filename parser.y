@@ -166,10 +166,10 @@ type:                 KW_CHAR {$$=createAST(TypeNode, NULL, NULL, NULL, NULL, NU
                       | KW_FLOAT {$$=createAST(TypeNode, NULL, NULL, NULL, NULL, NULL);}
                       ;
 
-literal:              LIT_INTEGER {$$=$1;}
-                      | LIT_FLOAT {$$=$1;}
-                      | LIT_CHAR {$$=$1;}
-                      | LIT_STRING {$$=$1;}
+literal:              LIT_INTEGER {$$=createAST(SymbolNode, $1, NULL, NULL, NULL, NULL);}
+                      | LIT_FLOAT {$$=createAST(SymbolNode, $1, NULL, NULL, NULL, NULL);}
+                      | LIT_CHAR {$$=createAST(SymbolNode, $1, NULL, NULL, NULL, NULL);}
+                      | LIT_STRING {$$=createAST(SymbolNode, $1, NULL, NULL, NULL, NULL);}
                       ;
 
 literal_list:         literal literal_list {$$=createAST(LiteralListNode, NULL, $1, $2, NULL, NULL);}
