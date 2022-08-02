@@ -43,6 +43,7 @@
 %left '.' '/'
 %right '~'
 
+%type<syntaxNode> expression
 %type<syntaxNode> expression_term
 %type<syntaxNode> variable
 
@@ -76,7 +77,8 @@ command:              command_block
                       | /*empty*/
                       ;
 
-assignment:           variable ASSIGNMENT expression;
+assignment:           variable ASSIGNMENT expression     {printAST($3,0);}
+                      ;
 read:                 KW_READ variable;
 return:               KW_RETURN expression;
 if:                   KW_IF '(' expression ')' command;
@@ -88,28 +90,28 @@ print_element_list:   LIT_STRING print_element_list
                       | /*empty*/
                       ;
 
-expression:           expression_term   {printAST($1);}
-                      | '(' expression ')'
-                      | '~' expression
-                      | expression '+' expression 
-                      | expression '-' expression
-                      | expression '.' expression
-                      | expression '/' expression
-                      | expression '<' expression
-                      | expression '>' expression
-                      | expression '&' expression
-                      | expression '|' expression
-                      | expression OPERATOR_LE  expression
-                      | expression OPERATOR_GE  expression
-                      | expression OPERATOR_EQ  expression
-                      | expression OPERATOR_DIF expression
-                      | function_call
+expression:           expression_term                       {$$=$1;}
+                      | '(' expression ')'                  {$$=$2;}
+                      | '~' expression                      {$$=createAST(NegationNode, NULL, $2, NULL, NULL, NULL);}
+                      | expression '+' expression           {$$=createAST(AddNode, NULL, $1, $3, NULL, NULL);}
+                      | expression '-' expression           {$$=createAST(SubNode, NULL, $1, $3, NULL, NULL);}
+                      | expression '.' expression           {$$=createAST(ProdNode, NULL, $1, $3, NULL, NULL);}
+                      | expression '/' expression           {$$=createAST(DivNode, NULL, $1, $3, NULL, NULL);}
+                      | expression '<' expression           {$$=createAST(LessNode, NULL, $1, $3, NULL, NULL);}
+                      | expression '>' expression           {$$=createAST(GreaterNode, NULL, $1, $3, NULL, NULL);}
+                      | expression '&' expression           {$$=createAST(AndNode, NULL, $1, $3, NULL, NULL);}
+                      | expression '|' expression           {$$=createAST(OrNode, NULL, $1, $3, NULL, NULL);}
+                      | expression OPERATOR_LE  expression  {$$=createAST(LessEqualNode, NULL, $1, $3, NULL, NULL);}
+                      | expression OPERATOR_GE  expression  {$$=createAST(GreaterEqualNode, NULL, $1, $3, NULL, NULL);}
+                      | expression OPERATOR_EQ  expression  {$$=createAST(EqualNode, NULL, $1, $3, NULL, NULL);}
+                      | expression OPERATOR_DIF expression  {$$=createAST(DifferentNode, NULL, $1, $3, NULL, NULL);}
+                      | function_call                       {$$=NULL; /*TODO: IMPLEMENT*/}
                       ;
 
-expression_term:      variable      {$$=NULL;}
-                      | LIT_INTEGER {$$=createAST(SymbolNode, $1, 0, NULL, NULL, NULL, NULL);}
-                      | LIT_FLOAT   {$$=createAST(SymbolNode, $1, 0, NULL, NULL, NULL, NULL);}
-                      | LIT_CHAR    {$$=createAST(SymbolNode, $1, 0, NULL, NULL, NULL, NULL);}
+expression_term:      variable      {$$=NULL;/*TODO: IMPLEMENT*/}
+                      | LIT_INTEGER {$$=createAST(SymbolNode, $1, NULL, NULL, NULL, NULL);}
+                      | LIT_FLOAT   {$$=createAST(SymbolNode, $1, NULL, NULL, NULL, NULL);}
+                      | LIT_CHAR    {$$=createAST(SymbolNode, $1, NULL, NULL, NULL, NULL);}
                       ;
 
 

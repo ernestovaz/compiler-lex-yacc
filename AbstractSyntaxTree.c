@@ -11,19 +11,36 @@ char* _nodeTypeName(SyntaxNodeType type) {
             return "SUB";
         case ProdNode:
             return "PROD";
+        case NegationNode:
+            return "NEGATION";
+        case LessNode:
+            return "LESS THAN";
+        case GreaterNode:
+            return "GREATER THAN";
+        case AndNode:
+            return "AND";
+        case OrNode:
+            return "OR";
+        case LessEqualNode:
+            return "LESS THAN OR EQUAL";
+        case GreaterEqualNode:
+            return "GREATER THAN OR EQUAL";
+        case EqualNode:
+            return "EQUAL";
+        case DifferentNode:
+            return "DIFFERENT";
         case SymbolNode:
             return "SYMBOL";
     }
     return "ERROR";
 }
 
-SyntaxTreeNode* createAST(SyntaxNodeType type, Symbol* symbol, int level, 
+SyntaxTreeNode* createAST(SyntaxNodeType type, Symbol* symbol,
     SyntaxTreeNode* c1, SyntaxTreeNode* c2, SyntaxTreeNode* c3, SyntaxTreeNode* c4){
 
     SyntaxTreeNode* node = malloc(sizeof(SyntaxTreeNode));
     node->type = type;
     node->symbol = symbol;
-    node->level = level;
     node->children[0] = c1;
     node->children[1] = c2;
     node->children[2] = c3;
@@ -31,15 +48,17 @@ SyntaxTreeNode* createAST(SyntaxNodeType type, Symbol* symbol, int level,
     return node;
 }
 
-void printAST(SyntaxTreeNode* node) {
+void printAST(SyntaxTreeNode* node, int level) {
     if(node != NULL) {
+        for(int i=0; i<level; i++) fprintf(stderr,"|");
+        if(level>0) fprintf(stderr, "_");
         fprintf(stderr, _nodeTypeName(node->type));
         fprintf(stderr, " ");
         if(node->symbol != NULL) fprintf(stderr, "%s", node->symbol->name);
         fprintf(stderr, "\n");
         for(int i=0; i<4; i++){
             SyntaxTreeNode* child = node->children[i];
-            printAST(child);
+            printAST(child, level+1);
         }
     }
 }
