@@ -31,6 +31,10 @@ char* _nodeTypeName(SyntaxNodeType type) {
             return "DIFFERENT";
         case SymbolNode:
             return "SYMBOL";
+        case VariableNode:
+            return "VARIABLE";
+        case IndexNode:
+            return "INDEX";
     }
     return "ERROR";
 }

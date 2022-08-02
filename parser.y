@@ -26,7 +26,7 @@
 %token OPERATOR_EQ       
 %token OPERATOR_DIF      
 
-%token TK_IDENTIFIER     
+%token<symbol> TK_IDENTIFIER     
 
 %token<symbol> LIT_INTEGER       
 %token<symbol> LIT_FLOAT         
@@ -108,7 +108,7 @@ expression:           expression_term                       {$$=$1;}
                       | function_call                       {$$=NULL; /*TODO: IMPLEMENT*/}
                       ;
 
-expression_term:      variable      {$$=NULL;/*TODO: IMPLEMENT*/}
+expression_term:      variable      {$$=$1;}
                       | LIT_INTEGER {$$=createAST(SymbolNode, $1, NULL, NULL, NULL, NULL);}
                       | LIT_FLOAT   {$$=createAST(SymbolNode, $1, NULL, NULL, NULL, NULL);}
                       | LIT_CHAR    {$$=createAST(SymbolNode, $1, NULL, NULL, NULL, NULL);}
@@ -124,8 +124,8 @@ variable_definition:  type TK_IDENTIFIER '(' literal ')' ';'
                       | type TK_IDENTIFIER '[' LIT_INTEGER ']' literal_list ';'
                       ;
 
-variable:             TK_IDENTIFIER 
-                      | TK_IDENTIFIER '[' expression ']'
+variable:             TK_IDENTIFIER {$$=createAST(VariableNode, $1, NULL, NULL, NULL, NULL);}
+                      | TK_IDENTIFIER '[' expression ']' {$$=createAST(IndexNode, $1, $3, NULL, NULL, NULL);}
                       ;
 
 type:                 KW_CHAR 
