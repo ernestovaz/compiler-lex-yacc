@@ -1,7 +1,7 @@
 #include "AbstractSyntaxTree.h"
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 char* _nodeTypeName(SyntaxNodeType type) {
     switch(type) {
@@ -69,4 +69,174 @@ void printAST(SyntaxTreeNode* node, int level) {
             printAST(child, level+1);
         }
     }
+}
+
+void _decompileExpression(SyntaxTreeNode* node, FILE* file) {
+    switch(node->type){
+        case SymbolNode:
+        case VariableNode:
+            _decompileSymbol(node, file);
+            break;
+        case ArrayNode:
+            _decompileArray(node, file);
+            break;
+        case NegationNode:
+            _decompileNegation(node, file);
+            break;
+        case AddNode:
+            _decompileAdd(node, file);
+            break;
+        case SubNode:
+            _decompileSub(node, file);
+            break;
+        case ProdNode:
+            _decompileProd(node, file);
+            break;
+        case DivNode:
+            _decompileDiv(node, file);
+            break;
+        case LessNode:
+            _decompileLess(node, file);
+            break;
+        case GreaterNode:
+            _decompileGreater(node, file);
+            break;
+        case AndNode:
+            _decompileAnd(node, file);
+            break;
+        case OrNode:
+            _decompileOr(node, file);
+            break;
+        case LessEqualNode:
+            _decompileLessEqual(node, file);
+            break;
+        case GreaterEqualNode:
+            _decompileGreaterEqual(node, file);
+            break;
+        case EqualNode:
+            _decompileEqual(node, file);
+            break;
+        case DifferentNode:
+            _decompileDifferent(node, file);
+            break;
+        case FunctionNode:
+            //_decompileFunction(node, file);
+            break;
+    }
+}
+
+void _decompileArray(SyntaxTreeNode* node, FILE* file) {
+    _decompileSymbol(node, file);
+    fprintf(file, "[");
+    _decompileExpression(node->children[0], file);
+    fprintf(file, "]");
+}
+
+void _decompileSymbol(SyntaxTreeNode* node, FILE* file) {
+    fprintf(file, node->symbol->name);
+}
+
+void _decompileAdd(SyntaxTreeNode* node, FILE* file) {
+    _decompileExpression(node->children[0], file);
+    fprintf(file, " + ");
+    _decompileExpression(node->children[1], file);
+}
+
+void _decompileSub(SyntaxTreeNode* node, FILE* file) {
+    _decompileExpression(node->children[0], file);
+    fprintf(file, " - ");
+    _decompileExpression(node->children[1], file);
+}
+
+void _decompileProd(SyntaxTreeNode* node, FILE* file) {
+    _decompileExpression(node->children[0], file);
+    fprintf(file, " . ");
+    _decompileExpression(node->children[1], file);
+}
+
+void _decompileDiv(SyntaxTreeNode* node, FILE* file) {
+    _decompileExpression(node->children[0], file);
+    fprintf(file, " - ");
+    _decompileExpression(node->children[1], file);
+}
+
+void _decompileLess(SyntaxTreeNode* node, FILE* file) {
+    _decompileExpression(node->children[0], file);
+    fprintf(file, " < ");
+    _decompileExpression(node->children[1], file);
+}
+
+void _decompileGreater(SyntaxTreeNode* node, FILE* file) {
+    _decompileExpression(node->children[0], file);
+    fprintf(file, " > ");
+    _decompileExpression(node->children[1], file);
+}
+
+void _decompileAnd(SyntaxTreeNode* node, FILE* file) {
+    _decompileExpression(node->children[0], file);
+    fprintf(file, " & ");
+    _decompileExpression(node->children[1], file);
+}
+
+void _decompileOr(SyntaxTreeNode* node, FILE* file) {
+    _decompileExpression(node->children[0], file);
+    fprintf(file, " | ");
+    _decompileExpression(node->children[1], file);
+}
+
+void _decompileNegation(SyntaxTreeNode* node, FILE* file) {
+    fprintf(file, "~");
+    _decompileExpression(node->children[0], file);
+}
+
+void _decompileLessEqual(SyntaxTreeNode* node, FILE* file) {
+    _decompileExpression(node->children[0], file);
+    fprintf(file, " <= ");
+    _decompileExpression(node->children[1], file);
+}
+
+void _decompileGreaterEqual(SyntaxTreeNode* node, FILE* file) {
+    _decompileExpression(node->children[0], file);
+    fprintf(file, " >= ");
+    _decompileExpression(node->children[1], file);
+}
+
+void _decompileEqual(SyntaxTreeNode* node, FILE* file) {
+    _decompileExpression(node->children[0], file);
+    fprintf(file, " == ");
+    _decompileExpression(node->children[1], file);
+}
+
+void _decompileDifferent(SyntaxTreeNode* node, FILE* file) {
+    _decompileExpression(node->children[0], file);
+    fprintf(file, " != ");
+    _decompileExpression(node->children[1], file);
+}
+
+void _decompileExpressionList(SyntaxTreeNode* node, FILE* file){
+    if(node != NULL) {
+        _decompileExpression(node->children[0], file);
+        if(node->children[1] != NULL){
+            fprintf(file, " ");
+            _decompileExpressionList(node->children[1], file);
+        }
+    }
+}
+
+void _decompileFunction(SyntaxTreeNode* node, FILE* file) {
+    fprintf(file, node->symbol->name);
+    fprintf(file, "(");
+    _decompileExpressionList(node->children[1], file);
+    fprintf(file, ")");
+}
+
+
+void _decompileProgram(SyntaxTreeNode* node, FILE* file) {
+    _decompileExpression(node, file);
+}
+
+void decompileAST(SyntaxTreeNode* node, char* filename) {
+    FILE* file = fopen(filename, "w"); 
+    _decompileProgram(node, file);
+    fclose(file); 
 }

@@ -79,7 +79,7 @@ command:              command_block
                       | /*empty*/
                       ;
 
-assignment:           variable ASSIGNMENT expression     {printAST($3,0);}
+assignment:           variable ASSIGNMENT expression     {printAST($3,0); decompileAST($3, "output.txt");}
                       ;
 read:                 KW_READ variable;
 return:               KW_RETURN expression;
