@@ -18,6 +18,7 @@ typedef enum syntax_node_type{
     DifferentNode,
     SymbolNode,
     VariableNode,
+    VariableDefNode,
     ArrayNode,
     FunctionNode,
     ExpressionListNode,
@@ -33,6 +34,9 @@ typedef enum syntax_node_type{
     CommandBlockNode,
     LiteralListNode,
     TypeNode,
+    FunctionDefNode,
+    DefinitionListNode,
+    ParameterListNode,
 }SyntaxNodeType;
 
 typedef struct syntax_tree_node {

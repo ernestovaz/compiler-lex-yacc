@@ -33,6 +33,8 @@ char* _nodeTypeName(SyntaxNodeType type) {
             return "SYMBOL";
         case VariableNode:
             return "VARIABLE";
+        case VariableDefNode:
+            return "VARIABLE DEFINITION";
         case ArrayNode:
             return "ARRAY";
         case FunctionNode:
@@ -63,6 +65,12 @@ char* _nodeTypeName(SyntaxNodeType type) {
             return "LITERAL LIST ELEMENT";
         case TypeNode:
             return "TYPE";
+        case DefinitionListNode:
+            return "DEFINITION LIST ELEMENT";
+        case FunctionDefNode:
+            return "FUNCTION DEFINITION";
+        case ParameterListNode:
+            return "PARAMETER LIST ELEMENT";
     }
     return "ERROR";
 }

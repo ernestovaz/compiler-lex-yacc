@@ -45,6 +45,7 @@
 %type<syntaxNode> expression
 %type<syntaxNode> expression_term
 %type<syntaxNode> variable
+%type<syntaxNode> variable_definition
 %type<syntaxNode> function_call
 %type<syntaxNode> expression_list
 %type<syntaxNode> assignment
@@ -61,21 +62,29 @@
 %type<syntaxNode> literal
 %type<syntaxNode> literal_list
 %type<syntaxNode> type
+%type<syntaxNode> program
+%type<syntaxNode> definition_list
+%type<syntaxNode> definition
+%type<syntaxNode> function_definition
+%type<syntaxNode> parameter_list
+%type<syntaxNode> integer
 
 %%
 
-program:              definition_list;
-definition_list:      definition definition_list
-                      | /*empty*/
+program:              definition_list {printAST($1, 0);}
+                      ;
+definition_list:      definition definition_list {$$=createAST(DefinitionListNode, NULL, $1, $2, NULL, NULL);}
+                      | /*empty*/ {$$=NULL;}
                       ;
 
-definition:           function_definition
-                      | variable_definition
+definition:           function_definition {$$=$1;}
+                      | variable_definition {$$=$1;}
                       ;
 
-function_definition:  type TK_IDENTIFIER '(' parameter_list ')' command_block;
-parameter_list:       type TK_IDENTIFIER parameter_list
-                      | /*empty*/
+function_definition:  type TK_IDENTIFIER '(' parameter_list ')' command_block {$$=createAST(FunctionDefNode, $2, $1, $4, $6, NULL);}
+                      ;
+parameter_list:       type TK_IDENTIFIER parameter_list {$$=createAST(ParameterListNode, $2, $1, $3, NULL, NULL);}
+                      | /*empty*/ {$$=NULL;}
                       ;
 command_block:        '{' command_list '}'  {$$=createAST(CommandBlockNode, NULL, $2, NULL, NULL, NULL);}
                       ;
@@ -143,10 +152,11 @@ expression_list:      expression expression_list {$$=createAST(ExpressionListNod
                       | /*empty*/ {$$=NULL;}
                       ;
 
-variable_definition:  type TK_IDENTIFIER '(' literal ')' ';'
-                      | type TK_IDENTIFIER '[' LIT_INTEGER ']' literal_list ';'
+variable_definition:  type TK_IDENTIFIER '(' literal ')' ';' {$$=createAST(VariableDefNode, $2, $1, $4, NULL, NULL);}
+                      | type TK_IDENTIFIER '[' integer ']' literal_list ';' {$$=createAST(VariableDefNode, $2, $1, $4, $6, NULL);}
                       ;
-
+integer:              LIT_INTEGER {$$=createAST(SymbolNode, $1, NULL, NULL, NULL, NULL);}
+                      ;
 variable:             TK_IDENTIFIER {$$=createAST(VariableNode, $1, NULL, NULL, NULL, NULL);}
                       | TK_IDENTIFIER '[' expression ']' {$$=createAST(ArrayNode, $1, $3, NULL, NULL, NULL);}
                       ;
