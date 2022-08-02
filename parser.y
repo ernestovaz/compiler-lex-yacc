@@ -162,7 +162,7 @@ literal:              LIT_INTEGER {$$=$1;}
                       ;
 
 literal_list:         literal literal_list {$$=createAST(LiteralListNode, NULL, $1, $2, NULL, NULL);}
-                      | /*empty*/
+                      | /*empty*/ {$$=NULL;}
                       ;
 
 %%
