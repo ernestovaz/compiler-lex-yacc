@@ -37,8 +37,8 @@ char* _nodeTypeName(SyntaxNodeType type) {
             return "ARRAY";
         case FunctionNode:
             return "FUNCTION";
-        case ListNode:
-            return "LIST";
+        case ExpressionListNode:
+            return "EXPRESSION LIST ELEMENT";
         case AssignmentNode:
             return "ASSIGNMENT";
         case ReadNode:
@@ -47,6 +47,14 @@ char* _nodeTypeName(SyntaxNodeType type) {
             return "RETURN";
         case PrintNode:
             return "PRINT";
+        case PrintListNode:
+            return "PRINT LIST ELEMENT";
+        case IfNode:
+            return "IF";
+        case CommandBlockNode:
+            return "COMMAND BLOCK";
+        case CommandListNode:
+            return "COMMAND LIST";
     }
     return "ERROR";
 }

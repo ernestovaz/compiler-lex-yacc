@@ -55,6 +55,9 @@
 %type<syntaxNode> if
 %type<syntaxNode> if_else
 %type<syntaxNode> while
+%type<syntaxNode> command_block
+%type<syntaxNode> command_list
+%type<syntaxNode> command
 
 %%
 
@@ -71,19 +74,20 @@ function_definition:  type TK_IDENTIFIER '(' parameter_list ')' command_block;
 parameter_list:       type TK_IDENTIFIER parameter_list
                       | /*empty*/
                       ;
-command_block:        '{' command_list '}';
-command_list:         command ';' command_list
-                      | command
+command_block:        '{' command_list '}'  {$$=createAST(CommandBlockNode, NULL, $2, NULL, NULL, NULL);}
                       ;
-command:              command_block
-                      | assignment {printAST($1, 0);}
-                      | read
-                      | return
-                      | print {printAST($1, 0);}
-                      | if
-                      | if_else
-                      | while
-                      | /*empty*/
+command_list:         command ';' command_list {$$=createAST(CommandListNode, NULL, $1, $3, NULL, NULL);}
+                      | command {$$=createAST(CommandListNode, NULL, $1, NULL, NULL, NULL);}
+                      ;
+command:              command_block {$$=$1;}
+                      | assignment {$$=$1;}
+                      | read {$$=$1;}
+                      | return {$$=$1;}
+                      | print {$$=$1;}
+                      | if {$$=$1;}
+                      | if_else {$$=$1;}
+                      | while {$$=$1;}
+                      | /*empty*/ {$$=NULL;}
                       ;
 
 assignment:           variable ASSIGNMENT expression     {$$=createAST(AssignmentNode, NULL, $1, $3, NULL, NULL);}
@@ -92,13 +96,14 @@ read:                 KW_READ variable {$$=createAST(ReadNode, NULL, $2, NULL, N
                       ;
 return:               KW_RETURN expression {$$=createAST(ReturnNode, NULL, $2, NULL, NULL, NULL);}
                       ;
-if:                   KW_IF '(' expression ')' command;
+if:                   KW_IF '(' expression ')' command  {$$=createAST(IfNode, NULL, $3, $5, NULL, NULL);}
+                      ;
 if_else:              KW_IF '(' expression ')' command KW_ELSE command;
 while:                KW_WHILE '(' expression ')' command;
 print:                KW_PRINT print_element_list {$$=createAST(PrintNode, NULL, $2, NULL, NULL, NULL);}
                       ;
-print_element_list:   LIT_STRING print_element_list {$$=createAST(ListNode, $1, $2, NULL, NULL, NULL);}
-                      | expression print_element_list {$$=createAST(ListNode, NULL, $1, $2, NULL, NULL);}
+print_element_list:   LIT_STRING print_element_list {$$=createAST(PrintListNode, $1, $2, NULL, NULL, NULL);}
+                      | expression print_element_list {$$=createAST(PrintListNode, NULL, $1, $2, NULL, NULL);}
                       | /*empty*/ {$$=NULL;}
                       ;
 
@@ -129,7 +134,7 @@ expression_term:      variable      {$$=$1;}
 
 function_call:        TK_IDENTIFIER '(' expression_list ')' {$$=createAST(FunctionNode, $1, $3, NULL, NULL, NULL);}
                       ;
-expression_list:      expression expression_list {$$=createAST(ListNode, NULL, $1, $2, NULL, NULL);}
+expression_list:      expression expression_list {$$=createAST(ExpressionListNode, NULL, $1, $2, NULL, NULL);}
                       | /*empty*/ {$$=NULL;}
                       ;
 
