@@ -53,6 +53,8 @@ char* _nodeTypeName(SyntaxNodeType type) {
             return "IF";
         case IfElseNode:
             return "IF ELSE";
+        case WhileNode:
+            return "WHILE";
         case CommandBlockNode:
             return "COMMAND BLOCK";
         case CommandListNode:

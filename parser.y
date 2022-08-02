@@ -103,7 +103,8 @@ if:                   KW_IF '(' expression ')' command  {$$=createAST(IfNode, NU
                       ;
 if_else:              KW_IF '(' expression ')' command KW_ELSE command {$$=createAST(IfElseNode, NULL, $3, $5, $7, NULL);}
                       ;
-while:                KW_WHILE '(' expression ')' command;
+while:                KW_WHILE '(' expression ')' command {$$=createAST(WhileNode, NULL, $3, $5, NULL, NULL);}
+                      ;
 print:                KW_PRINT print_element_list {$$=createAST(PrintNode, NULL, $2, NULL, NULL, NULL);}
                       ;
 print_element_list:   LIT_STRING print_element_list {$$=createAST(PrintListNode, $1, $2, NULL, NULL, NULL);}

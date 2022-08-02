@@ -28,6 +28,7 @@ typedef enum syntax_node_type{
     PrintListNode,
     IfNode,
     IfElseNode,
+    WhileNode,
     CommandListNode,
     CommandBlockNode,
     LiteralListNode,
