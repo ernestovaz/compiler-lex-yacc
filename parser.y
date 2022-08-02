@@ -50,6 +50,11 @@
 %type<syntaxNode> assignment
 %type<syntaxNode> read
 %type<syntaxNode> return
+%type<syntaxNode> print
+%type<syntaxNode> print_element_list
+%type<syntaxNode> if
+%type<syntaxNode> if_else
+%type<syntaxNode> while
 
 %%
 
@@ -74,7 +79,7 @@ command:              command_block
                       | assignment {printAST($1, 0);}
                       | read
                       | return
-                      | print
+                      | print {printAST($1, 0);}
                       | if
                       | if_else
                       | while
@@ -90,10 +95,11 @@ return:               KW_RETURN expression {$$=createAST(ReturnNode, NULL, $2, N
 if:                   KW_IF '(' expression ')' command;
 if_else:              KW_IF '(' expression ')' command KW_ELSE command;
 while:                KW_WHILE '(' expression ')' command;
-print:                KW_PRINT print_element_list;
-print_element_list:   LIT_STRING print_element_list
-                      | expression print_element_list
-                      | /*empty*/
+print:                KW_PRINT print_element_list {$$=createAST(PrintNode, NULL, $2, NULL, NULL, NULL);}
+                      ;
+print_element_list:   LIT_STRING print_element_list {$$=createAST(ListNode, $1, $2, NULL, NULL, NULL);}
+                      | expression print_element_list {$$=createAST(ListNode, NULL, $1, $2, NULL, NULL);}
+                      | /*empty*/ {$$=NULL;}
                       ;
 
 expression:           expression_term                       {$$=$1;}

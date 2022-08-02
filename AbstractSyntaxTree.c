@@ -45,6 +45,8 @@ char* _nodeTypeName(SyntaxNodeType type) {
             return "READ";
         case ReturnNode:
             return "RETURN";
+        case PrintNode:
+            return "PRINT";
     }
     return "ERROR";
 }
