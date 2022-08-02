@@ -22,7 +22,19 @@ typedef enum syntax_node_type{
     VariableNode,
     ArrayNode,
     FunctionNode,
-    ListNode,
+    ExpressionListNode,
+    AssignmentNode,
+    ReadNode,
+    ReturnNode,
+    PrintNode,
+    PrintListNode,
+    IfNode,
+    IfElseNode,
+    WhileNode,
+    CommandListNode,
+    CommandBlockNode,
+    LiteralListNode,
+    TypeNode,
 }SyntaxNodeType;
 
 typedef struct syntax_tree_node {
