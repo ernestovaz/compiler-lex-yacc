@@ -27,8 +27,11 @@ typedef enum syntax_node_type{
     PrintNode,
     PrintListNode,
     IfNode,
+    IfElseNode,
     CommandListNode,
     CommandBlockNode,
+    LiteralListNode,
+    TypeNode,
 }SyntaxNodeType;
 
 typedef struct syntax_tree_node {

@@ -51,10 +51,16 @@ char* _nodeTypeName(SyntaxNodeType type) {
             return "PRINT LIST ELEMENT";
         case IfNode:
             return "IF";
+        case IfElseNode:
+            return "IF ELSE";
         case CommandBlockNode:
             return "COMMAND BLOCK";
         case CommandListNode:
             return "COMMAND LIST";
+        case LiteralListNode:
+            return "LITERAL LIST ELEMENT";
+        case TypeNode:
+            return "TYPE";
     }
     return "ERROR";
 }

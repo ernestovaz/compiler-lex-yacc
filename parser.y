@@ -58,6 +58,9 @@
 %type<syntaxNode> command_block
 %type<syntaxNode> command_list
 %type<syntaxNode> command
+%type<syntaxNode> literal
+%type<syntaxNode> literal_list
+%type<syntaxNode> type
 
 %%
 
@@ -98,7 +101,8 @@ return:               KW_RETURN expression {$$=createAST(ReturnNode, NULL, $2, N
                       ;
 if:                   KW_IF '(' expression ')' command  {$$=createAST(IfNode, NULL, $3, $5, NULL, NULL);}
                       ;
-if_else:              KW_IF '(' expression ')' command KW_ELSE command;
+if_else:              KW_IF '(' expression ')' command KW_ELSE command {$$=createAST(IfElseNode, NULL, $3, $5, $7, NULL);}
+                      ;
 while:                KW_WHILE '(' expression ')' command;
 print:                KW_PRINT print_element_list {$$=createAST(PrintNode, NULL, $2, NULL, NULL, NULL);}
                       ;
@@ -146,18 +150,18 @@ variable:             TK_IDENTIFIER {$$=createAST(VariableNode, $1, NULL, NULL, 
                       | TK_IDENTIFIER '[' expression ']' {$$=createAST(ArrayNode, $1, $3, NULL, NULL, NULL);}
                       ;
 
-type:                 KW_CHAR 
-                      | KW_INT
-                      | KW_FLOAT
+type:                 KW_CHAR {$$=createAST(TypeNode, NULL, NULL, NULL, NULL, NULL);}
+                      | KW_INT {$$=createAST(TypeNode, NULL, NULL, NULL, NULL, NULL);}
+                      | KW_FLOAT {$$=createAST(TypeNode, NULL, NULL, NULL, NULL, NULL);}
                       ;
 
-literal:              LIT_INTEGER 
-                      | LIT_FLOAT
-                      | LIT_CHAR
-                      | LIT_STRING
+literal:              LIT_INTEGER {$$=$1;}
+                      | LIT_FLOAT {$$=$1;}
+                      | LIT_CHAR {$$=$1;}
+                      | LIT_STRING {$$=$1;}
                       ;
 
-literal_list:         literal literal_list
+literal_list:         literal literal_list {$$=createAST(LiteralListNode, NULL, $1, $2, NULL, NULL);}
                       | /*empty*/
                       ;
 
