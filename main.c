@@ -90,8 +90,11 @@ int main(int argc, char** argv) {
   initMe();
   yyparse();
   SyntaxTreeNode* syntaxTree = getSyntaxTreeRoot();
-  printAST(syntaxTree, 0);
-  if(filename != NULL) decompileAST(syntaxTree, filename);
-  fprintf(stderr, "Program successfully parsed.\n");
+  if(filename != NULL){ 
+    printSymbolTable(symbolTable);
+    printAST(syntaxTree, 0);
+    decompileAST(syntaxTree, filename);
+  }
+  fprintf(stderr, "Program successfully parsed!\n");
   exit(0);
 }

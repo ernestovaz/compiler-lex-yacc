@@ -92,6 +92,5 @@ return                    { return KW_RETURN; }
 %%
 
 int yywrap(void) {
-  printSymbolTable(symbolTable);
   return 1;
 }

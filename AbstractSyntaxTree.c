@@ -98,8 +98,8 @@ SyntaxTreeNode* createAST(SyntaxNodeType type, Symbol* symbol,
 
 void printAST(SyntaxTreeNode* node, int level) {
     if(node != NULL) {
-        for(int i=0; i<level; i++) fprintf(stderr," |");
-        if(level>0) fprintf(stderr, "_");
+        for(int i=0; i<level; i++) fprintf(stderr," ");
+        if(level>0) fprintf(stderr, "|_");
         fprintf(stderr, _nodeTypeName(node->type));
         fprintf(stderr, " ");
         if(node->symbol != NULL) fprintf(stderr, "%s", node->symbol->name);
