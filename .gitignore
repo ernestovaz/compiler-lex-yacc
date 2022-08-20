@@ -3,6 +3,7 @@ etapa2
 etapa3
 etapa4
 lex.yy.c
+lex.yy.h
 y.tab.c
 y.output
 y.tab.h
