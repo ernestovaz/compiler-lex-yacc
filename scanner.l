@@ -95,7 +95,3 @@ int yywrap(void) {
   printSymbolTable(symbolTable);
   return 1;
 }
-
-#include "y.tab.c"
-#include "main.c"
-

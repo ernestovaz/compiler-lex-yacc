@@ -1,8 +1,17 @@
 %{
   #include "AbstractSyntaxTree.h"
   #include "Symbol.h"
+  #include "lex.yy.h"
+  
+  extern int lineNumber;
+
   int yyerror(char* s);
   char* filename = "output.txt";
+  SyntaxTreeNode* syntaxTreeRoot;
+  
+  SyntaxTreeNode* getSyntaxTreeRoot() {
+    return syntaxTreeRoot;
+  }
 %}
 
 %union{
@@ -72,7 +81,7 @@
 
 %%
 
-program:              definition_list {printAST($1, 0); decompileAST($1, filename);}
+program:              definition_list {syntaxTreeRoot = $1;}//printAST($1, 0); decompileAST($1, filename);}
                       ;
 definition_list:      definition definition_list {$$=createAST(DefinitionListNode, NULL, $1, $2, NULL, NULL);}
                       | /*empty*/ {$$=NULL;}

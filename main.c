@@ -1,5 +1,24 @@
 #define MAX_ASCII_CHAR_CODE 127
 
+#include "y.tab.c"
+
+#include "SymbolTable.h"
+#include "AbstractSyntaxTree.h"
+
+#include "Decompilation.h"
+
+#include <stdio.h>
+
+int yylex();
+extern char* yytext;
+extern int lineCount;
+extern SymbolTable* symbolTable; 
+extern FILE* yyin;
+
+void initMe(void);
+int getLineNumber(void);
+int isRunning(void);
+
 char* get_token_name(int char_code){
   switch(char_code){
     case 256:
@@ -56,6 +75,7 @@ void pretty_print(int char_code){
 }
 
 int main(int argc, char** argv) {
+  char* filename = NULL;
   if (argc >= 2) {
     if (0==(yyin = fopen(argv[1],"r")))
     {
@@ -69,6 +89,9 @@ int main(int argc, char** argv) {
   }
   initMe();
   yyparse();
+  SyntaxTreeNode* syntaxTree = getSyntaxTreeRoot();
+  printAST(syntaxTree, 0);
+  if(filename != NULL) decompileAST(syntaxTree, filename);
   fprintf(stderr, "Program successfully parsed.\n");
   exit(0);
 }

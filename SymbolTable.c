@@ -4,7 +4,7 @@
 
 #include "SymbolTable.h"
 
-int _hashFunction(char* key){
+int hashFunction(char* key){
     int sum = 0;
     for (int i=0; i<strlen(key); i++){
         sum = (3*sum+(int)key[i]) % TABLE_SIZE;
@@ -12,7 +12,7 @@ int _hashFunction(char* key){
     return sum;
 }
 
-SymbolTableNode* _createNode(char* name, SymbolType type) {
+SymbolTableNode* createNode(char* name, SymbolType type) {
     Symbol* symbol = malloc(sizeof(Symbol));
     symbol->name = (char*) malloc (strlen(name) + 1);
     strcpy(symbol->name, name);
@@ -26,7 +26,7 @@ SymbolTableNode* _createNode(char* name, SymbolType type) {
     return node;
 }
 
-void _handleCollision(SymbolTableNode* position, SymbolTableNode* node){
+void handleCollision(SymbolTableNode* position, SymbolTableNode* node){
     while(position != NULL){
         if (strcmp(position->key, node->key) == 0){
             position->symbol = node->symbol;
@@ -40,7 +40,7 @@ void _handleCollision(SymbolTableNode* position, SymbolTableNode* node){
     }
 }
 
-char* _getSymbolTypeName(SymbolType type) {
+char* getSymbolTypeName(SymbolType type) {
     switch(type) {
         case SymbolIdentifier:
             return "Identifier";
@@ -56,8 +56,8 @@ char* _getSymbolTypeName(SymbolType type) {
     return "ERROR";
 }
 
-void _printSymbol(Symbol symbol){
-    char* type = _getSymbolTypeName(symbol.type);
+void printSymbol(Symbol symbol){
+    char* type = getSymbolTypeName(symbol.type);
     printf("%-15s %s", type, symbol.name);
 }
 
@@ -74,9 +74,9 @@ SymbolTable* createSymbolTable(){
 }
 
 Symbol* insertSymbol(SymbolTable* table, char* name, SymbolType type){
-    SymbolTableNode* node = _createNode(name, type);
+    SymbolTableNode* node = createNode(name, type);
 
-    int index = _hashFunction(name);
+    int index = hashFunction(name);
     SymbolTableNode* position = table->table[index];
     if (position == NULL){
         if (table->count == table->size){
@@ -87,14 +87,14 @@ Symbol* insertSymbol(SymbolTable* table, char* name, SymbolType type){
         table->count++;
     }
     else{
-        _handleCollision(position, node);
+        handleCollision(position, node);
     }
 
     return node->symbol;
 }
 
 Symbol* getSymbol(SymbolTable* table, char* name){
-    int index = _hashFunction(name);
+    int index = hashFunction(name);
     SymbolTableNode* node = table->table[index];
 
     while(node != NULL){
@@ -131,7 +131,7 @@ void printSymbolTable(SymbolTable* table){
         if (node != NULL) {
             do {
                 printf("[%011d] ", node->key);
-                _printSymbol(*(node->symbol));
+                printSymbol(*(node->symbol));
                 printf("\n");
                 node = node->next;
             } while(node != NULL);
