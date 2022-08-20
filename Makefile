@@ -15,4 +15,9 @@ run: etapa4
 	./etapa4
 
 test: etapa4
-	./etapa4 programs/correct.code
+	@echo
+	for test_file in programs/*.code;\
+	do\
+		echo "TEST: $$test_file";\
+		./etapa4 $$test_file || true;\
+	done
