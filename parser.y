@@ -72,7 +72,7 @@
 
 %%
 
-program:              definition_list {printAST($1, 0); decompileAST($1, filenamne);}
+program:              definition_list {printAST($1, 0); decompileAST($1, filename);}
                       ;
 definition_list:      definition definition_list {$$=createAST(DefinitionListNode, NULL, $1, $2, NULL, NULL);}
                       | /*empty*/ {$$=NULL;}

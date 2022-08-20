@@ -72,6 +72,7 @@ void _decompileSymbol(SyntaxTreeNode* node, FILE* file);
 void _decompileArray(SyntaxTreeNode* node, FILE* file);
 
 // expressions
+void _decompileParentheses(SyntaxTreeNode* node, FILE* file);
 void _decompileAdd(SyntaxTreeNode* node, FILE* file);
 void _decompileSub(SyntaxTreeNode* node, FILE* file);
 void _decompileProd(SyntaxTreeNode* node, FILE* file);

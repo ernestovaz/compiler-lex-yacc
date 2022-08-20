@@ -8,3 +8,6 @@ y.tab.h
 a.out
 .vscode/
 output.txt
+.idea/.gitignore
+.idea/misc.xml
+.idea/vcs.xml
