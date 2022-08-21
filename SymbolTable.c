@@ -26,15 +26,14 @@ SymbolTableNode* createNode(char* name, SymbolType type) {
     return node;
 }
 
-void handleCollision(SymbolTableNode* position, SymbolTableNode* node){
+Symbol* handleCollision(SymbolTableNode* position, SymbolTableNode* node){
     while(position != NULL){
         if (strcmp(position->key, node->key) == 0){
-            position->symbol = node->symbol;
-            return;
+            return position->symbol;
         } 
         if (position->next == NULL) {
             position->next = node;
-            return;
+            return node->symbol;
         }
         position = position->next;
     }
@@ -85,12 +84,11 @@ Symbol* insertSymbol(SymbolTable* table, char* name, SymbolType type){
         }
         table->table[index] = node;
         table->count++;
+        return node->symbol;
     }
     else{
-        handleCollision(position, node);
+        return handleCollision(position, node);
     }
-
-    return node->symbol;
 }
 
 Symbol* getSymbol(SymbolTable* table, char* name){

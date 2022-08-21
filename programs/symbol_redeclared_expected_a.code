@@ -1,0 +1,8 @@
+char a('a');
+int b(5);
+
+int main() {
+    a <- b;
+}
+
+float a(2,5);

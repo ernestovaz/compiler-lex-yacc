@@ -2,6 +2,34 @@
 
 #include "Symbol.h"
 
+void decompileProgram(SyntaxTreeNode* node, FILE* file) {
+    decompileDefinitionList(node, file);
+}
+
+void decompileDefinitionList(SyntaxTreeNode* node, FILE* file) {
+    if(node != NULL) {
+        decompileDefinition(node->children[0], file);
+        if(node->children[1] != NULL){
+            fprintf(file, "\n");
+            decompileDefinitionList(node->children[1], file);
+        }
+    }
+}
+
+void decompileDefinition(SyntaxTreeNode* node, FILE* file) {
+    switch(node->type){
+        case FunctionDefNode:
+            decompileFunctionDef(node, file);
+            break;
+        case VariableDefNode:
+            decompileVariableDef(node, file);
+            break;
+        case ArrayDefNode:
+            decompileArrayDef(node, file);
+            break;
+    }
+}
+
 void decompileExpression(SyntaxTreeNode* node, FILE* file) {
     switch(node->type){
         case ParenthesesNode:
@@ -346,33 +374,6 @@ void decompileFunctionDef(SyntaxTreeNode* node, FILE* file) {
     decompileCommandBlock(node->children[2], file);
 }
 
-void decompileDefinition(SyntaxTreeNode* node, FILE* file) {
-    switch(node->type){
-        case FunctionDefNode:
-            decompileFunctionDef(node, file);
-            break;
-        case VariableDefNode:
-            decompileVariableDef(node, file);
-            break;
-        case ArrayDefNode:
-            decompileArrayDef(node, file);
-            break;
-    }
-}
-
-void decompileDefinitionList(SyntaxTreeNode* node, FILE* file) {
-    if(node != NULL) {
-        decompileDefinition(node->children[0], file);
-        if(node->children[1] != NULL){
-            fprintf(file, "\n");
-            decompileDefinitionList(node->children[1], file);
-        }
-    }
-}
-
-void decompileProgram(SyntaxTreeNode* node, FILE* file) {
-    decompileDefinitionList(node, file);
-}
 
 void decompileAST(SyntaxTreeNode* node, char* filename) {
     FILE* file = fopen(filename, "w"); 

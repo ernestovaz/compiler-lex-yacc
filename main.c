@@ -6,6 +6,7 @@
 #include "AbstractSyntaxTree.h"
 
 #include "Decompilation.h"
+#include "SemanticAnalysis.h"
 
 #include <stdio.h>
 
@@ -95,6 +96,7 @@ int main(int argc, char** argv) {
     printAST(syntaxTree, 0);
     decompileAST(syntaxTree, filename);
   }
+  analyzeSyntaxTree(syntaxTree);
   fprintf(stderr, "Program successfully parsed!\n");
   exit(0);
 }

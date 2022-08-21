@@ -1,5 +1,5 @@
 etapa4: y.tab.c lex.yy.c
-	gcc -o etapa4 lex.yy.c main.c SymbolTable.c AbstractSyntaxTree.c Decompilation.c
+	gcc -o etapa4 lex.yy.c main.c SymbolTable.c AbstractSyntaxTree.c Decompilation.c SemanticAnalysis.c
 
 y.tab.c: parser.y
 	yacc -d parser.y
@@ -18,6 +18,8 @@ test: etapa4
 	@echo
 	for test_file in programs/*.code;\
 	do\
+		echo;\
 		echo "TEST: $$test_file";\
 		./etapa4 $$test_file || true;\
 	done
+
