@@ -16,7 +16,7 @@ run: etapa4
 
 test: etapa4
 	@echo
-	for test_file in programs/*.code;\
+	for test_file in test_programs/*.code;\
 	do\
 		echo;\
 		echo "TEST: $$test_file";\
