@@ -1,0 +1,8 @@
+
+int v[10] 'a' 0 0 0 0 0 0 0 0 0;
+int i(1);
+float f (2,5);
+char d(100);
+char c('x');
+float b('c');
+int a ('A');

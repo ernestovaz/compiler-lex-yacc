@@ -1,4 +1,5 @@
 #pragma once
+#include "DataType.h"
 
 typedef enum symbol_type{
     //assigned to symbols at syntax parsing
@@ -16,4 +17,5 @@ typedef enum symbol_type{
 typedef struct symbol{
     char* name;
     SymbolType type;
+    DataType dataType;
 } Symbol;

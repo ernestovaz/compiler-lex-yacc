@@ -1,0 +1,6 @@
+char b(1);
+int a(2,5);
+
+int main() {
+    a <- b;
+}

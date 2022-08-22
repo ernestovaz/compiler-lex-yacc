@@ -1,5 +1,7 @@
 #include "SemanticAnalysis.h"
 
+#include "DataType.h"
+
 #include<stdlib.h>
 
 int errorCount;
@@ -24,25 +26,66 @@ void analyzeDefinitionList(SyntaxTreeNode* node) {
     }
 }
 
+DataType dataTypeFromTypeNode(SyntaxTreeNode* node) {
+    switch(node->type) {
+        case IntTypeNode:
+            return DataTypeInt;
+        case FloatTypeNode:
+            return DataTypeFloat;
+        case CharTypeNode:
+            return DataTypeChar;
+    }
+}
+
+DataType dataTypeFromLiteralNode(SyntaxTreeNode* node) {
+    Symbol* symbol = node->symbol;
+    switch(symbol->type) {
+        case SymbolIntLiteral:
+            return DataTypeInt;
+        case SymbolFloatLiteral:
+            return DataTypeFloat;
+        case SymbolStringLiteral:
+            return DataTypeString;
+    }
+}
+
+int areTypesIncompatible(DataType t1, DataType t2) {
+    // int and char are interchangeably compatible
+    if(t1 == DataTypeInt && t2 == DataTypeChar) return 0;
+    else if (t1 == DataTypeChar && t2 == DataTypeInt) return 0;
+    else return t1 != t2;
+}
+
 void checkSymbolDeclaration(SyntaxTreeNode* node) {
     Symbol* symbol = node->symbol;
+
+    //save declared data type for symbol
+    DataType declaredType = dataTypeFromTypeNode(node->children[0]);
+    symbol->dataType = declaredType;
+
     if(symbol->type != SymbolIdentifier){
         fprintf(stderr, "error: Symbol redeclared: %s\n", symbol->name);
         errorCount++;
     }
     else {
-        SymbolType type;
+        SymbolType symbolType;
         switch(node->type) {
             case FunctionDefNode:
-                type = SymbolFunction;
+                symbolType = SymbolFunction;
                 break;
             case VariableDefNode:
-                type = SymbolVariable;
+                symbolType = SymbolVariable;
+                DataType literalType = dataTypeFromLiteralNode(node->children[1]);
+                if(areTypesIncompatible(declaredType, literalType)) {
+                    fprintf(stderr, "error: Incompatible value literal specified for variable: %s\n", symbol->name);
+                    errorCount++;
+                }
                 break;
             case ArrayDefNode:
-                type = SymbolArray;
+                symbolType = SymbolArray;
                 break;
         }
-        symbol->type = type;
+        symbol->type = symbolType;
     }
+    
 };
