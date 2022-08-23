@@ -18,4 +18,5 @@ typedef struct symbol{
     char* name;
     SymbolType type;
     DataType dataType;
+    int arraySize;
 } Symbol;

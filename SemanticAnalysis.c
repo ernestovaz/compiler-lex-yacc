@@ -56,6 +56,18 @@ int areTypesIncompatible(DataType t1, DataType t2) {
     else return t1 != t2;
 }
 
+int isArrayListIncompatible(int expectedSize, DataType expectedType, SyntaxTreeNode* literalList) {
+    int actualSize = 0;
+    while(literalList != NULL) {
+        DataType literalType = dataTypeFromLiteralNode(literalList->children[0]);
+        if(areTypesIncompatible(expectedType, literalType)) return 1;
+        literalList = literalList->children[1];
+        actualSize++;
+    }
+    if(actualSize != expectedSize) return 1;
+    else return 0;
+}
+
 void checkSymbolDeclaration(SyntaxTreeNode* node) {
     Symbol* symbol = node->symbol;
 
@@ -83,6 +95,21 @@ void checkSymbolDeclaration(SyntaxTreeNode* node) {
                 break;
             case ArrayDefNode:
                 symbolType = SymbolArray;
+                SyntaxTreeNode* arraySizeNode = node->children[1];
+                DataType sizeLiteralType = dataTypeFromLiteralNode(arraySizeNode);
+                int declaredSize = atoi(arraySizeNode->symbol->name);
+                if(declaredSize <= 0) {
+                    fprintf(stderr, "error: Non positive integer size specified for array: %s\n", symbol->name);
+                    errorCount++;
+                }
+                SyntaxTreeNode* elementList = node->children[2];
+                if(elementList != NULL) {
+                    if(isArrayListIncompatible(declaredSize, declaredType, elementList)) {
+                        fprintf(stderr, "error: Incompatible list for array: %s\n", symbol->name);
+                        errorCount++;
+                    }
+                }
+                symbol->arraySize = declaredSize;
                 break;
         }
         symbol->type = symbolType;

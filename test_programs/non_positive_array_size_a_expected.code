@@ -1,0 +1,7 @@
+char c('x');
+char d(100);
+int v ('A');
+int i(1);
+int a[0];
+int matrix[100]; 
+float f (2,5);
