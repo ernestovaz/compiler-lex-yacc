@@ -1,0 +1,12 @@
+int a(4);
+float paulo[5];
+int b(5);
+char c(5);
+
+int main () {
+    return paulo[4] + a;
+    return paulo[3] - c;
+    return a / c;
+    return b . a;
+    return b + paulo[0];
+}

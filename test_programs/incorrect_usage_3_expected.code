@@ -1,0 +1,10 @@
+
+int a(4);
+int paulo[5];
+char denis('a');
+
+int main () {
+    return a[2];
+    return paulo;
+    return denis[0];
+}

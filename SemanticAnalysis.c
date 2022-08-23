@@ -30,6 +30,7 @@ void analyzeProgram(SyntaxTreeNode* node) {
         if(definition != NULL && definition->type == FunctionDefNode) {
             DataType returnType = definition->symbol->dataType;
             SyntaxTreeNode* commandList = definition->children[2]->children[0];
+            //TODO: HANDLE SYMBOL ARGUMENTS
             analyzeFunction(commandList, returnType);
         }
         analyzeProgram(node->children[1]);
@@ -41,7 +42,8 @@ void analyzeFunction(SyntaxTreeNode* commandList, DataType returnType) {
     if(commandNode != NULL) {
         switch(commandNode->type) {
             case ReturnNode:
-                if(isExpressionInvalid(commandNode->children[0], returnType)){
+                DataType expressionType = getExpressionDataType(commandNode->children[0]); 
+                if(areTypesIncompatible(expressionType, returnType)){
                     fprintf(stderr, "error: Incompatible type for return in function\n");
                     fflush(stderr);
                     errorCount++;
@@ -53,7 +55,7 @@ void analyzeFunction(SyntaxTreeNode* commandList, DataType returnType) {
 }
 
 
-int isExpressionInvalid(SyntaxTreeNode* expressionNode, DataType expectedType) {
+DataType getExpressionDataType(SyntaxTreeNode* expressionNode) {
     Symbol* symbol = expressionNode->symbol;
     switch (expressionNode->type) {
         case VariableNode:
@@ -61,30 +63,42 @@ int isExpressionInvalid(SyntaxTreeNode* expressionNode, DataType expectedType) {
                 fprintf(stderr, "error: Incorrect usage for variable: %s\n", symbol->name);
                 errorCount++;
             }
-            return areTypesIncompatible(symbol->dataType, expectedType);
+            return symbol->dataType;
         
         case ArrayNode:
             if(symbol->type != SymbolArray) {
                 fprintf(stderr, "error: Incorrect usage for array: %s\n", symbol->name);
                 errorCount++;
-            }
-            SyntaxTreeNode* arrayIndex = expressionNode->children[0];
-            if(isExpressionInvalid(arrayIndex, DataTypeInt)) {
-                fprintf(stderr, "error: Non integer index specified for array: %s\n", symbol->name);
-                errorCount++;
             } else {
-                int indexValue = atoi(arrayIndex->symbol->name);
-                if (indexValue < 0 || indexValue >= symbol->arraySize) {
-                    fprintf(stderr, "error: Index out of bounds specified for array: %s\n", symbol->name);
+                SyntaxTreeNode* arrayIndex = expressionNode->children[0];
+                if(getExpressionDataType(arrayIndex) != DataTypeInt) {
+                    fprintf(stderr, "error: Non integer index specified for array: %s\n", symbol->name);
                     errorCount++;
+                } else {
+                    int indexValue = atoi(arrayIndex->symbol->name);
+                    if (indexValue < 0 || indexValue >= symbol->arraySize) {
+                        fprintf(stderr, "error: Index out of bounds specified for array: %s\n", symbol->name);
+                        errorCount++;
+                    }
                 }
             }
-            return areTypesIncompatible(symbol->dataType, expectedType);
+            return symbol->dataType;
 
         case SymbolNode:
-            DataType dataType = dataTypeFromLiteralNode(expressionNode);
-            return areTypesIncompatible(dataType, expectedType);
+            return dataTypeFromLiteralNode(expressionNode);
 
+        case AddNode:
+        case SubNode:
+        case ProdNode:
+        case DivNode:
+            DataType leftDataType = getExpressionDataType(expressionNode->children[0]);
+            DataType rightDataType = getExpressionDataType(expressionNode->children[1]);
+            if(areNumericTypesIncompatible(leftDataType, rightDataType)) {
+                fprintf(stderr, "error: Incompatible values in expression \n");
+                fflush(stderr);
+                errorCount++;
+            }
+            return leftDataType;
     }
     return 0; //for now accepts by default, ideally shouldn't
 }
@@ -117,6 +131,16 @@ int areTypesIncompatible(DataType t1, DataType t2) {
     if(t1 == DataTypeInt && t2 == DataTypeChar) return 0;
     else if (t1 == DataTypeChar && t2 == DataTypeInt) return 0;
     else return t1 != t2;
+}
+
+int areNumericTypesIncompatible(DataType t1, DataType t2) {
+    if(t1 == DataTypeBool || t2 == DataTypeBool) return 1;
+    else return areTypesIncompatible(t1, t2);
+}
+
+int areBooleanTypesIncompatible(DataType t1, DataType t2) {
+    if(t1 != DataTypeBool || t2 != DataTypeBool) return 1;
+    else return 0;
 }
 
 int isArrayListIncompatible(int expectedSize, DataType expectedType, SyntaxTreeNode* literalList) {
