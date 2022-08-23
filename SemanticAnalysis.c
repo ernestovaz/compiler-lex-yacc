@@ -1,29 +1,67 @@
 #include "SemanticAnalysis.h"
 
-#include "DataType.h"
 
 #include<stdlib.h>
 
 int errorCount;
 
-void analyzeSyntaxTree(SyntaxTreeNode* node){
+void analyzeSyntaxTree(SyntaxTreeNode* root){
     errorCount = 0;
-    analyzeDefinitionList(node);
+    analyzeDefinitionList(root);
+    analyzeProgram(root);
     if(errorCount > 0){
         fprintf(stderr, "Found %d semantic error", errorCount);
         if(errorCount > 1) fprintf(stderr, "s");
         fprintf(stderr, ".\n");
         exit(4);
-    }
+}
 }
 
 void analyzeDefinitionList(SyntaxTreeNode* node) {
     if(node != NULL) {
         checkSymbolDeclaration(node->children[0]);
-        if(node->children[1] != NULL) {
-            analyzeDefinitionList(node->children[1]);
+        analyzeDefinitionList(node->children[1]);
+    }
+}
+
+void analyzeProgram(SyntaxTreeNode* node) {
+    if(node != NULL) {
+        SyntaxTreeNode* definition = node->children[0];
+        if(definition != NULL && definition->type == FunctionDefNode) {
+            DataType returnType = definition->symbol->dataType;
+            SyntaxTreeNode* commandList = definition->children[2]->children[0];
+            analyzeFunction(commandList, returnType);
+        }
+        analyzeProgram(node->children[1]);
+    }
+}
+
+void analyzeFunction(SyntaxTreeNode* commandList, DataType returnType) {
+    SyntaxTreeNode* commandNode = commandList->children[0];
+    if(commandNode != NULL) {
+        switch(commandNode->type) {
+            case ReturnNode:
+                if(isExpressionInvalid(commandNode->children[0], returnType)){
+                    fprintf(stderr, "error: Incompatible type for return in function\n");
+                    fflush(stderr);
+                    errorCount++;
+                }
         }
     }
+    SyntaxTreeNode* next = commandList->children[1];
+    if(next != NULL) analyzeFunction(next, returnType);
+}
+
+int isExpressionInvalid(SyntaxTreeNode* expressionNode, DataType expectedType) {
+    switch (expressionNode->type) {
+    case SymbolNode:
+        Symbol* symbol;
+        if(symbol->type != SymbolArray && symbol->type != SymbolVariable) {
+            DataType dataType = dataTypeFromLiteralNode(expressionNode);
+            return areTypesIncompatible(dataType, expectedType);
+        }
+    }
+    return 0; //for now accepts by default, ideally shouldn't
 }
 
 DataType dataTypeFromTypeNode(SyntaxTreeNode* node) {
@@ -84,6 +122,7 @@ void checkSymbolDeclaration(SyntaxTreeNode* node) {
         switch(node->type) {
             case FunctionDefNode:
                 symbolType = SymbolFunction;
+                //TODO: FILL THE FUNCTION SYMBOL WITH ARGUMENT COUNT AND TYPES
                 break;
             case VariableDefNode:
                 symbolType = SymbolVariable;

@@ -1,0 +1,15 @@
+int main () {
+    return 2;
+}
+
+char henrique() {
+    return 2;
+}
+
+int paulo(int x int n) {
+    return 'a';
+}
+
+float mauro(float x float b){
+    print "Nao tem como isso..\n"
+}
