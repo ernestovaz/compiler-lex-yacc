@@ -57,15 +57,15 @@ int isExpressionInvalid(SyntaxTreeNode* expressionNode, DataType expectedType) {
     Symbol* symbol = expressionNode->symbol;
     switch (expressionNode->type) {
         case VariableNode:
-            if(symbol->dataType != SymbolVariable) {
-                fprintf(stderr, "error: Incorrect usage for variable: %s", symbol->name);
+            if(symbol->type != SymbolVariable) {
+                fprintf(stderr, "error: Incorrect usage for variable: %s\n", symbol->name);
                 errorCount++;
             }
             return areTypesIncompatible(symbol->dataType, expectedType);
         
         case ArrayNode:
-            if(symbol->dataType != SymbolArray) {
-                fprintf(stderr, "error: Incorrect usage for array: %s", symbol->name);
+            if(symbol->type != SymbolArray) {
+                fprintf(stderr, "error: Incorrect usage for array: %s\n", symbol->name);
                 errorCount++;
             }
             SyntaxTreeNode* arrayIndex = expressionNode->children[0];

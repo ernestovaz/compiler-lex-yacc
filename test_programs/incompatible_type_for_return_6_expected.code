@@ -1,0 +1,24 @@
+int a(4);
+float paulo[5];
+
+int main () {
+    return 2,2;
+    return a;
+    return paulo[2];
+}
+
+char henrique() {
+    return 5,5;
+    return a;
+    return paulo[2];
+}
+
+float vanderlei(int x int n) {
+    return 'a';
+    return a;
+    return paulo[2];
+}
+
+float mauro(float x float b){
+    print "Nao tem como isso..\n"
+}
