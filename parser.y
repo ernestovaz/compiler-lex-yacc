@@ -1,4 +1,6 @@
 %{
+// Ernesto Vaz de Oliveira - 00302470
+// Ricco Vasconcellos Constante Soares - 00307968
   #include "AbstractSyntaxTree.h"
   #include "Symbol.h"
   #include "lex.yy.h"

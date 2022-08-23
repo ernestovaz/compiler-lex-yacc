@@ -1,3 +1,5 @@
+// Ernesto Vaz de Oliveira - 00302470
+// Ricco Vasconcellos Constante Soares - 00307968
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

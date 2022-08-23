@@ -1,3 +1,5 @@
+// Ernesto Vaz de Oliveira - 00302470
+// Ricco Vasconcellos Constante Soares - 00307968
 #define MAX_ASCII_CHAR_CODE 127
 
 #include "y.tab.c"
