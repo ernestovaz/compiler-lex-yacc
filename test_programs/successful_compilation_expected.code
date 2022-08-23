@@ -16,6 +16,7 @@ of multiple lines
 
 int main ()
   {
+  marcos <- 2;
   a <- 'c';
   a <- a - ((i));
   a <- 5,4;
@@ -57,4 +58,5 @@ int incn (int x int n )
   return x + n
   }
 
+int marcos(2);
 ## end of file

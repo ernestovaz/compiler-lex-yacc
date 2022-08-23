@@ -52,14 +52,39 @@ void analyzeFunction(SyntaxTreeNode* commandList, DataType returnType) {
     if(next != NULL) analyzeFunction(next, returnType);
 }
 
+
 int isExpressionInvalid(SyntaxTreeNode* expressionNode, DataType expectedType) {
+    Symbol* symbol = expressionNode->symbol;
     switch (expressionNode->type) {
-    case SymbolNode:
-        Symbol* symbol;
-        if(symbol->type != SymbolArray && symbol->type != SymbolVariable) {
+        case VariableNode:
+            if(symbol->dataType != SymbolVariable) {
+                fprintf(stderr, "error: Incorrect usage for variable: %s", symbol->name);
+                errorCount++;
+            }
+            return areTypesIncompatible(symbol->dataType, expectedType);
+        
+        case ArrayNode:
+            if(symbol->dataType != SymbolArray) {
+                fprintf(stderr, "error: Incorrect usage for array: %s", symbol->name);
+                errorCount++;
+            }
+            SyntaxTreeNode* arrayIndex = expressionNode->children[0];
+            if(isExpressionInvalid(arrayIndex, DataTypeInt)) {
+                fprintf(stderr, "error: Non integer index specified for array: %s\n", symbol->name);
+                errorCount++;
+            } else {
+                int indexValue = atoi(arrayIndex->symbol->name);
+                if (indexValue < 0 || indexValue >= symbol->arraySize) {
+                    fprintf(stderr, "error: Index out of bounds specified for array: %s\n", symbol->name);
+                    errorCount++;
+                }
+            }
+            return areTypesIncompatible(symbol->dataType, expectedType);
+
+        case SymbolNode:
             DataType dataType = dataTypeFromLiteralNode(expressionNode);
             return areTypesIncompatible(dataType, expectedType);
-        }
+
     }
     return 0; //for now accepts by default, ideally shouldn't
 }
