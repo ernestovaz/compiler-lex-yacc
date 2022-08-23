@@ -58,7 +58,14 @@ void analyzeFunction(SyntaxTreeNode* commandList, DataType returnType) {
 DataType getExpressionDataType(SyntaxTreeNode* expressionNode) {
     Symbol* symbol = expressionNode->symbol;
     switch (expressionNode->type) {
+        case ParenthesesNode:
+            return getExpressionDataType(expressionNode->children[0]); 
+
         case VariableNode:
+            if(isUndeclared(symbol)) {
+                fprintf(stderr, "error: Symbol undeclared: %s\n", symbol->name);
+                errorCount++;
+            }
             if(symbol->type != SymbolVariable) {
                 fprintf(stderr, "error: Incorrect usage for variable: %s\n", symbol->name);
                 errorCount++;
@@ -66,6 +73,10 @@ DataType getExpressionDataType(SyntaxTreeNode* expressionNode) {
             return symbol->dataType;
         
         case ArrayNode:
+            if(isUndeclared(symbol)) {
+                fprintf(stderr, "error: Symbol undeclared: %s\n", symbol->name);
+                errorCount++;
+            }
             if(symbol->type != SymbolArray) {
                 fprintf(stderr, "error: Incorrect usage for array: %s\n", symbol->name);
                 errorCount++;
@@ -90,7 +101,7 @@ DataType getExpressionDataType(SyntaxTreeNode* expressionNode) {
         case AddNode:
         case SubNode:
         case ProdNode:
-        case DivNode:
+        case DivNode: {
             DataType leftDataType = getExpressionDataType(expressionNode->children[0]);
             DataType rightDataType = getExpressionDataType(expressionNode->children[1]);
             if(areNumericTypesIncompatible(leftDataType, rightDataType)) {
@@ -99,6 +110,34 @@ DataType getExpressionDataType(SyntaxTreeNode* expressionNode) {
                 errorCount++;
             }
             return leftDataType;
+        }
+        case EqualNode:
+        case GreaterEqualNode:
+        case LessEqualNode:
+        case LessNode:
+        case GreaterNode:
+        case DifferentNode:
+        case AndNode:
+        case OrNode: {
+            DataType leftDataType = getExpressionDataType(expressionNode->children[0]);
+            DataType rightDataType = getExpressionDataType(expressionNode->children[1]);
+            if(areBooleanTypesIncompatible(leftDataType, rightDataType)) {
+                fprintf(stderr, "error: Incompatible values in expression \n");
+                fflush(stderr);
+                errorCount++;
+            }
+            return leftDataType;
+        }
+
+        case NegationNode: {
+            DataType dataType = getExpressionDataType(expressionNode->children[0]);
+            if(dataType != DataTypeBool) {
+                fprintf(stderr, "error: Incompatible value in expression \n");
+                fflush(stderr);
+                errorCount++;
+            }
+            return dataType;
+        }
     }
     return 0; //for now accepts by default, ideally shouldn't
 }
@@ -140,6 +179,11 @@ int areNumericTypesIncompatible(DataType t1, DataType t2) {
 
 int areBooleanTypesIncompatible(DataType t1, DataType t2) {
     if(t1 != DataTypeBool || t2 != DataTypeBool) return 1;
+    else return 0;
+}
+
+int isUndeclared(Symbol* symbol) {
+    if(symbol->type == SymbolIdentifier) return 1;
     else return 0;
 }
 

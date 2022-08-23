@@ -15,6 +15,7 @@ int areTypesIncompatible(DataType t1, DataType t2);
 int areNumericTypesIncompatible(DataType t1, DataType t2); 
 int areBooleanTypesIncompatible(DataType t1, DataType t2); 
 
+int isUndeclared(Symbol* symbol);
 int isArrayListIncompatible(int size, DataType type, SyntaxTreeNode* list);
 DataType getExpressionDataType(SyntaxTreeNode* expressionNode);
 
