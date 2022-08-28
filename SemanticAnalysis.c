@@ -34,29 +34,128 @@ void analyzeProgram(SyntaxTreeNode* node) {
             DataType returnType = definition->symbol->dataType;
             SyntaxTreeNode* commandList = definition->children[2]->children[0];
             //TODO: HANDLE SYMBOL ARGUMENTS
-            analyzeFunction(commandList, returnType);
+            analyzeCommandList(commandList, returnType);
         }
         analyzeProgram(node->children[1]);
     }
 }
 
-void analyzeFunction(SyntaxTreeNode* commandList, DataType returnType) {
+void analyzeCommandList(SyntaxTreeNode* commandList, DataType returnType) {
     SyntaxTreeNode* commandNode = commandList->children[0];
-    if(commandNode != NULL) {
-        switch(commandNode->type) {
-            case ReturnNode:
-                DataType expressionType = getExpressionDataType(commandNode->children[0]); 
-                if(areTypesIncompatible(expressionType, returnType)){
+    analyzeCommand(commandNode, returnType);
+    SyntaxTreeNode* next = commandList->children[1];
+    if(next != NULL) analyzeCommandList(next, returnType);
+}
+
+void analyzeCommand(SyntaxTreeNode* node, DataType returnType) {
+    if(node != NULL) {
+        switch(node->type) {
+            case CommandBlockNode:
+                analyzeCommandList(node->children[0], returnType);
+                break;
+            case AssignmentNode: 
+                analyzeAssignment(node);
+                break;
+            case ReadNode:
+                analyzeRead(node);
+                break;
+            case ReturnNode: {
+                DataType expressionType = getExpressionDataType(node->children[0]); 
+                if(areNumericTypesIncompatible(expressionType, returnType)){
                     fprintf(stderr, "error: Incompatible type for return in function\n");
                     fflush(stderr);
                     errorCount++;
                 }
+                break;
+            }
+            case IfNode: {
+                DataType conditionType = getExpressionDataType(node->children[0]);
+                if(conditionType != DataTypeBool){
+                    fprintf(stderr, "error: If condition must be of boolean type.\n");
+                    fflush(stderr);
+                    errorCount++;
+                }
+                analyzeCommand(node->children[1], returnType);
+                break;
+            }
+            case IfElseNode: {
+                DataType conditionType = getExpressionDataType(node->children[0]);
+                if(conditionType != DataTypeBool){
+                    fprintf(stderr, "error: If condition must be of boolean type.\n");
+                    fflush(stderr);
+                    errorCount++;
+                }
+                analyzeCommand(node->children[1], returnType);
+                analyzeCommand(node->children[2], returnType);
+                break;
+            }
+            case WhileNode: {
+                DataType conditionType = getExpressionDataType(node->children[0]);
+                if(conditionType != DataTypeBool){
+                    fprintf(stderr, "error: While condition must be of boolean type.\n");
+                    fflush(stderr);
+                    errorCount++;
+                }
+                analyzeCommand(node->children[1], returnType);
+                break;
+            }
         }
     }
-    SyntaxTreeNode* next = commandList->children[1];
-    if(next != NULL) analyzeFunction(next, returnType);
 }
 
+void analyzeAssignment(SyntaxTreeNode* node) {
+    SyntaxTreeNode* dataNode = node->children[0];
+    Symbol* symbol = dataNode->symbol;
+    checkSymbolUndeclared(symbol);
+    if(symbol->type == SymbolFunction) {
+        fprintf(stderr, "error: Cannot assign value to function: %s\n", symbol->name);
+        errorCount++;
+    }
+    else {
+        checkVariableArrayUsage(dataNode);
+        DataType expectedType = symbol->dataType;
+        DataType type = getExpressionDataType(node->children[1]);
+        if (areNumericTypesIncompatible(expectedType, type)){
+            fprintf(stderr, "error: Incompatible type for assignment to symbol: %s\n", symbol->name);
+            errorCount++;
+        }
+    }
+}
+
+void analyzeRead(SyntaxTreeNode* node) {
+    SyntaxTreeNode* variableOrArrayNode = node->children[0];
+    Symbol* symbol = variableOrArrayNode->symbol;
+    checkSymbolUndeclared(symbol);
+    if(symbol->type == SymbolFunction) {
+        fprintf(stderr, "error: Cannot assign value to function: %s\n", symbol->name);
+        errorCount++;
+    }
+    else checkVariableArrayUsage(variableOrArrayNode);
+}
+
+void checkVariableArrayUsage(SyntaxTreeNode* node) {
+    Symbol* symbol = node->symbol;
+    if(node->type == VariableNode) {
+        if(symbol->type == SymbolArray) {
+            fprintf(stderr, "error: Attempt to use variable as array: %s\n", symbol->name);
+            errorCount++;
+        }
+    }
+    else if(node->type == ArrayNode) {
+        if(symbol->type == SymbolVariable) {
+            fprintf(stderr, "error: Attempt to index a variable: %s\n", symbol->name);
+            errorCount++;
+        } 
+        else {
+            SyntaxTreeNode* arrayIndex = node->children[0];
+            DataType indexType = getExpressionDataType(arrayIndex);
+            if(areNumericTypesIncompatible(indexType, DataTypeInt)) {
+                fprintf(stderr, "error: Non integer index specified for array: %s\n", symbol->name);
+                errorCount++;
+            } 
+        }
+    }
+}
 
 DataType getExpressionDataType(SyntaxTreeNode* expressionNode) {
     Symbol* symbol = expressionNode->symbol;
@@ -65,10 +164,7 @@ DataType getExpressionDataType(SyntaxTreeNode* expressionNode) {
             return getExpressionDataType(expressionNode->children[0]); 
 
         case VariableNode:
-            if(isUndeclared(symbol)) {
-                fprintf(stderr, "error: Symbol undeclared: %s\n", symbol->name);
-                errorCount++;
-            }
+            checkSymbolUndeclared(symbol);
             if(symbol->type != SymbolVariable) {
                 fprintf(stderr, "error: Incorrect usage for variable: %s\n", symbol->name);
                 errorCount++;
@@ -76,10 +172,7 @@ DataType getExpressionDataType(SyntaxTreeNode* expressionNode) {
             return symbol->dataType;
         
         case ArrayNode:
-            if(isUndeclared(symbol)) {
-                fprintf(stderr, "error: Symbol undeclared: %s\n", symbol->name);
-                errorCount++;
-            }
+            checkSymbolUndeclared(symbol);
             if(symbol->type != SymbolArray) {
                 fprintf(stderr, "error: Incorrect usage for array: %s\n", symbol->name);
                 errorCount++;
@@ -114,12 +207,30 @@ DataType getExpressionDataType(SyntaxTreeNode* expressionNode) {
             }
             return leftDataType;
         }
-        case EqualNode:
         case GreaterEqualNode:
         case LessEqualNode:
         case LessNode:
-        case GreaterNode:
-        case DifferentNode:
+        case GreaterNode: {
+            DataType leftDataType = getExpressionDataType(expressionNode->children[0]);
+            DataType rightDataType = getExpressionDataType(expressionNode->children[1]);
+            if(areNumericTypesIncompatible(leftDataType, rightDataType)) {
+                fprintf(stderr, "error: Incompatible values in expression \n");
+                fflush(stderr);
+                errorCount++;
+            }
+            return DataTypeBool;
+            }
+        case EqualNode:
+        case DifferentNode: {
+            DataType leftDataType = getExpressionDataType(expressionNode->children[0]);
+            DataType rightDataType = getExpressionDataType(expressionNode->children[1]);
+            if(areTypesIncompatible(leftDataType, rightDataType)) {
+                fprintf(stderr, "error: Incompatible values in expression \n");
+                fflush(stderr);
+                errorCount++;
+            }
+            return DataTypeBool;
+        }
         case AndNode:
         case OrNode: {
             DataType leftDataType = getExpressionDataType(expressionNode->children[0]);
@@ -129,9 +240,8 @@ DataType getExpressionDataType(SyntaxTreeNode* expressionNode) {
                 fflush(stderr);
                 errorCount++;
             }
-            return leftDataType;
+            return DataTypeBool;
         }
-
         case NegationNode: {
             DataType dataType = getExpressionDataType(expressionNode->children[0]);
             if(dataType != DataTypeBool) {
@@ -140,6 +250,16 @@ DataType getExpressionDataType(SyntaxTreeNode* expressionNode) {
                 errorCount++;
             }
             return dataType;
+        }
+                           
+        case FunctionNode: {
+            if(symbol->type != SymbolFunction) {
+                fprintf(stderr, "error: Error non-function symbol used as function: %s\n", symbol->name);
+                errorCount++;
+            }
+            else checkFunctionUsage(expressionNode);
+            return symbol->dataType;
+            
         }
     }
     return 0; //for now accepts by default, ideally shouldn't
@@ -185,9 +305,11 @@ int areBooleanTypesIncompatible(DataType t1, DataType t2) {
     else return 0;
 }
 
-int isUndeclared(Symbol* symbol) {
-    if(symbol->type == SymbolIdentifier) return 1;
-    else return 0;
+void checkSymbolUndeclared(Symbol* symbol) {
+    if(symbol->type == SymbolIdentifier){
+        fprintf(stderr, "error: Symbol undeclared: %s\n", symbol->name);
+        errorCount++;
+    } 
 }
 
 int isArrayListIncompatible(int expectedSize, DataType expectedType, SyntaxTreeNode* literalList) {
@@ -202,52 +324,107 @@ int isArrayListIncompatible(int expectedSize, DataType expectedType, SyntaxTreeN
     else return 0;
 }
 
+void checkFunctionDeclaration(SyntaxTreeNode* node) {
+    Symbol* functionSymbol = node->symbol;
+    int argumentCount = 0;
+    SyntaxTreeNode* argumentList = node->children[1];
+    while(argumentList != NULL) {
+        Symbol* argumentSymbol = argumentList->symbol;
+        if(argumentSymbol->type != SymbolIdentifier){
+            fprintf(stderr, "error: Symbol redeclared: %s\n", argumentSymbol->name);
+            errorCount++;
+        } else {
+            DataType argumentType = dataTypeFromTypeNode(argumentList->children[0]);
+            argumentSymbol->dataType = argumentType;
+            argumentSymbol->type = SymbolVariable;
+        }
+        argumentList = argumentList->children[1];
+        argumentCount++;
+    }
+    DataType* arguments = malloc(argumentCount * sizeof(DataType));
+    argumentList = node->children[1];
+    int index = 0;
+    while(argumentList != NULL) {
+        arguments[index] = dataTypeFromTypeNode(argumentList->children[0]);
+        argumentList = argumentList->children[1];
+        index++;
+    }
+    functionSymbol->argumentCount = argumentCount;
+    functionSymbol->arguments = arguments;
+}
+
+void checkFunctionUsage(SyntaxTreeNode* node) {
+    Symbol* functionSymbol = node->symbol;
+    int argumentCount = 0;
+    SyntaxTreeNode* argumentList = node->children[0];
+    while(argumentList != NULL) {
+        argumentCount++;
+        if(argumentCount > functionSymbol->argumentCount) {
+            fprintf(stderr, "error: Too many arguments for function: %s\n", functionSymbol->name);
+            errorCount++;
+            return;
+        }
+        DataType expectedType = functionSymbol->arguments[argumentCount - 1];
+        DataType argumentType = getExpressionDataType(argumentList->children[0]);
+        if(areTypesIncompatible(expectedType, argumentType)) {
+            fprintf(stderr, "error: Incompatible arguments for function: %s\n", functionSymbol->name);
+            errorCount++;
+            return;
+        }
+        argumentList = argumentList->children[1];
+    }
+    if(argumentCount < functionSymbol->argumentCount) {
+        fprintf(stderr, "error: Too few arguments for function: %s\n", functionSymbol->name);
+        errorCount++;
+    }
+}
+
 void checkSymbolDeclaration(SyntaxTreeNode* node) {
     Symbol* symbol = node->symbol;
+
+    if(symbol->type != SymbolIdentifier){
+        fprintf(stderr, "error: Symbol redeclared: %s\n", symbol->name);
+        errorCount++;
+        return;
+    }
 
     //save declared data type for symbol
     DataType declaredType = dataTypeFromTypeNode(node->children[0]);
     symbol->dataType = declaredType;
 
-    if(symbol->type != SymbolIdentifier){
-        fprintf(stderr, "error: Symbol redeclared: %s\n", symbol->name);
-        errorCount++;
-    }
-    else {
-        SymbolType symbolType;
-        switch(node->type) {
-            case FunctionDefNode:
-                symbolType = SymbolFunction;
-                //TODO: FILL THE FUNCTION SYMBOL WITH ARGUMENT COUNT AND TYPES
-                break;
-            case VariableDefNode:
-                symbolType = SymbolVariable;
-                DataType literalType = dataTypeFromLiteralNode(node->children[1]);
-                if(areTypesIncompatible(declaredType, literalType)) {
-                    fprintf(stderr, "error: Incompatible value literal specified for variable: %s\n", symbol->name);
+    SymbolType symbolType;
+    switch(node->type) {
+        case FunctionDefNode:
+            symbolType = SymbolFunction;
+            checkFunctionDeclaration(node);
+            break;
+        case VariableDefNode:
+            symbolType = SymbolVariable;
+            DataType literalType = dataTypeFromLiteralNode(node->children[1]);
+            if(areTypesIncompatible(declaredType, literalType)) {
+                fprintf(stderr, "error: Incompatible value literal specified for variable: %s\n", symbol->name);
+                errorCount++;
+            }
+            break;
+        case ArrayDefNode:
+            symbolType = SymbolArray;
+            SyntaxTreeNode* arraySizeNode = node->children[1];
+            DataType sizeLiteralType = dataTypeFromLiteralNode(arraySizeNode);
+            int declaredSize = atoi(arraySizeNode->symbol->name);
+            if(declaredSize <= 0) {
+                fprintf(stderr, "error: Non positive integer size specified for array: %s\n", symbol->name);
+                errorCount++;
+            }
+            SyntaxTreeNode* elementList = node->children[2];
+            if(elementList != NULL) {
+                if(isArrayListIncompatible(declaredSize, declaredType, elementList)) {
+                    fprintf(stderr, "error: Incompatible list for array: %s\n", symbol->name);
                     errorCount++;
                 }
-                break;
-            case ArrayDefNode:
-                symbolType = SymbolArray;
-                SyntaxTreeNode* arraySizeNode = node->children[1];
-                DataType sizeLiteralType = dataTypeFromLiteralNode(arraySizeNode);
-                int declaredSize = atoi(arraySizeNode->symbol->name);
-                if(declaredSize <= 0) {
-                    fprintf(stderr, "error: Non positive integer size specified for array: %s\n", symbol->name);
-                    errorCount++;
-                }
-                SyntaxTreeNode* elementList = node->children[2];
-                if(elementList != NULL) {
-                    if(isArrayListIncompatible(declaredSize, declaredType, elementList)) {
-                        fprintf(stderr, "error: Incompatible list for array: %s\n", symbol->name);
-                        errorCount++;
-                    }
-                }
-                symbol->arraySize = declaredSize;
-                break;
-        }
-        symbol->type = symbolType;
+            }
+            symbol->arraySize = declaredSize;
+            break;
     }
+    symbol->type = symbolType;
     
 };

@@ -19,6 +19,6 @@ float vanderlei(int x int n) {
     return paulo[2];
 }
 
-float mauro(float x float b){
+float mauro(float o float b){
     print "Nao tem como isso..\n"
 }

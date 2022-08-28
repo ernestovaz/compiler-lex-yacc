@@ -1,0 +1,26 @@
+char ice_cold(1);
+int high(5);
+float pretty(2,5);
+int summer('a');
+int pilot_jones[5];
+
+int make(int a int b int c) {
+    return c;
+}
+
+int run(float d float e) {
+    return 5;
+}
+
+float stop(int f char g) {
+    return stop(5,5 'a');
+    return stop(2 2 2);
+}
+
+int main() {
+    return make(high ice_cold pilot_jones[2]);
+    return run(5,5 pretty);   
+    return run();
+    return main();
+    return ice_cold();
+}

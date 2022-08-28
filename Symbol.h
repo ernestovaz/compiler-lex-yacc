@@ -22,4 +22,6 @@ typedef struct symbol{
     SymbolType type;
     DataType dataType;
     int arraySize;
+    DataType* arguments;
+    int argumentCount;
 } Symbol;

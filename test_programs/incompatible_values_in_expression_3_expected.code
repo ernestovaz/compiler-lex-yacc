@@ -1,0 +1,12 @@
+int a(4);
+float paulo[5];
+int b(5);
+char c(5);
+
+int main () {
+    if(b > a){};
+    if(c >= b){;;;;} else; 
+    while(b & paulo[4]){{}};
+    if(paulo[4] | b);
+    b <- a + 5 + 2,5;
+}

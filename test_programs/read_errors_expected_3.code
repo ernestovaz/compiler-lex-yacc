@@ -1,0 +1,10 @@
+char b(4);
+float c[3];
+
+int main() {
+    read main ;
+    read c ;
+    read b[0] ;
+    read c[2] ;
+    read b ;
+}

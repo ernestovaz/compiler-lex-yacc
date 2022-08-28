@@ -10,15 +10,21 @@ void analyzeSyntaxTree(SyntaxTreeNode* root);
 
 void analyzeDefinitionList(SyntaxTreeNode* node);
 void analyzeProgram(SyntaxTreeNode* node);
-void analyzeFunction(SyntaxTreeNode* commandList, DataType returnType);
+void analyzeCommandList(SyntaxTreeNode* commandList, DataType returnType);
+void analyzeCommand(SyntaxTreeNode* commandList, DataType returnType);
+void analyzeAssignment(SyntaxTreeNode* node);
+void analyzeRead(SyntaxTreeNode* node);
 
 void checkSymbolDeclaration(SyntaxTreeNode* node);
+void checkFunctionDeclaration(SyntaxTreeNode* node);
+void checkFunctionUsage(SyntaxTreeNode* node);
+void checkVariableArrayUsage(SyntaxTreeNode* node);
 
 int areTypesIncompatible(DataType t1, DataType t2); 
 int areNumericTypesIncompatible(DataType t1, DataType t2); 
 int areBooleanTypesIncompatible(DataType t1, DataType t2); 
 
-int isUndeclared(Symbol* symbol);
+void checkSymbolUndeclared(Symbol* symbol);
 int isArrayListIncompatible(int size, DataType type, SyntaxTreeNode* list);
 DataType getExpressionDataType(SyntaxTreeNode* expressionNode);
 
