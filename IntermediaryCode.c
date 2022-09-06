@@ -30,6 +30,9 @@ void printCode(ThreeAddressCode* code) {
             case TACMove:
                 fprintf(stderr,"MOVE");
                 break;
+            case TACAccess:
+                fprintf(stderr,"ACCESS");
+                break;
             case TACAdd:
                 fprintf(stderr,"ADD");
                 break;
@@ -80,6 +83,9 @@ void printCode(ThreeAddressCode* code) {
                 break;
             case TACJump:
                 fprintf(stderr,"JUMP");
+                break;
+            case TACJumpF:
+                fprintf(stderr,"JUMPF");
                 break;
             case TACCall:
                 fprintf(stderr,"CALL");
@@ -133,6 +139,13 @@ ThreeAddressCode* joinCodes(ThreeAddressCode* c1, ThreeAddressCode* c2) {
 
 ThreeAddressCode* generateBinaryOperationCode(ThreeAddressCodeType type, ThreeAddressCode* op1, ThreeAddressCode* op2, SymbolTable* table);
 ThreeAddressCode* generateUnaryOperationCode(ThreeAddressCodeType type, ThreeAddressCode* op, SymbolTable* table);
+ThreeAddressCode* generateAccessCode(Symbol* symbol, ThreeAddressCode* index, SymbolTable* table);
+ThreeAddressCode* generateFunctionCode(Symbol* symbol, ThreeAddressCode* c1);
+ThreeAddressCode* generateIfElse(ThreeAddressCode* c1, ThreeAddressCode* c2, ThreeAddressCode* c3, SymbolTable* table);
+ThreeAddressCode* generateIf(ThreeAddressCode* c1, ThreeAddressCode* c2, SymbolTable* table);
+ThreeAddressCode* generateWhile(ThreeAddressCode* c1, ThreeAddressCode* c2, SymbolTable* table);
+ThreeAddressCode* generateMoveCode(ThreeAddressCode* c1, ThreeAddressCode* c2);
+ThreeAddressCode* generateWhile(ThreeAddressCode* c1, ThreeAddressCode* c2, SymbolTable* table);
 
 ThreeAddressCode* generateCode(SyntaxTreeNode* node, SymbolTable* table){
     ThreeAddressCode* result = NULL;
@@ -143,10 +156,59 @@ ThreeAddressCode* generateCode(SyntaxTreeNode* node, SymbolTable* table){
             subtrees[i] = generateCode(node->children[i], table);
 
         switch(node->type) {
+            case FunctionDefNode:
+                result = generateFunctionCode(node->symbol, subtrees[2]);
+                break;
+            
             case VariableNode:
             case SymbolNode: 
                 result = createCode(TACSymbol, NULL, NULL, node->symbol);
                 break;
+                
+            case ArrayNode:
+                result = generateAccessCode(node->symbol, subtrees[0], table);
+                break;
+
+            case AssignmentNode:
+                result = generateMoveCode(subtrees[1], subtrees[0]);
+                break;
+
+            case ReadNode: 
+                result = joinCodes(subtrees[0], createCode(TACRead, NULL, NULL, subtrees[0]?subtrees[0]->result:NULL));
+                break;
+
+            case PrintListNode:
+                if(node->symbol)
+                    result = joinCodes(createCode(TACPrint, NULL, NULL, node->symbol), subtrees[1]);
+                else 
+                    result = joinCodes(subtrees[0], joinCodes(createCode(TACPrint, NULL, NULL, subtrees[0]?subtrees[0]->result:NULL), subtrees[1]));
+                break;
+                
+            case ReturnNode:
+                result = joinCodes(subtrees[0], createCode(TACRet, NULL, NULL, subtrees[0]?subtrees[0]->result:NULL));
+                break;
+                
+            case IfNode:
+                result = generateIf(subtrees[0], subtrees[1], table);
+                break;
+
+            case IfElseNode:
+                result = generateIfElse(subtrees[0], subtrees[1], subtrees[2], table);
+                break;
+                
+            case WhileNode:
+                result = generateWhile(subtrees[0], subtrees[1], table);
+                break;
+                
+            case FunctionNode:
+                result = joinCodes(subtrees[0], createCode(TACCall, node->symbol, NULL, insertTemporary(table)));
+                break;
+            
+            case ExpressionListNode:
+                result = joinCodes(createCode(TACArg, NULL, NULL, subtrees[0]?subtrees[0]->result:NULL), subtrees[1]);
+                break;
+            
+            // Operators
             case AddNode:
                 result = generateBinaryOperationCode(TACAdd, subtrees[0], subtrees[1], table);
                 break;
@@ -186,6 +248,7 @@ ThreeAddressCode* generateCode(SyntaxTreeNode* node, SymbolTable* table){
             case NegationNode:
                 result = generateUnaryOperationCode(TACNeg, subtrees[0], table);
                 break;
+
             default:
                 result = joinCodes(subtrees[0],joinCodes(subtrees[1],
                 joinCodes(subtrees[2],subtrees[3])));
@@ -218,4 +281,101 @@ ThreeAddressCode* generateUnaryOperationCode(ThreeAddressCodeType type, ThreeAdd
             insertTemporary(table)
         )
     );
+}
+
+ThreeAddressCode* generateMoveCode(ThreeAddressCode* c1, ThreeAddressCode* c2) {
+    return joinCodes(
+        joinCodes(c1,c2), 
+        createCode(
+            TACMove, 
+            c1?c1->result:NULL,
+            NULL, 
+            c2?c2->result:NULL
+        )
+    );
+    
+}
+
+ThreeAddressCode* generateAccessCode(Symbol* symbol, ThreeAddressCode* index, SymbolTable* table) {
+    return joinCodes(
+        index, 
+        createCode(
+            TACAccess, 
+            symbol,
+            index?index->result:NULL, 
+            insertTemporary(table)
+        )
+    );
+}
+
+ThreeAddressCode* generateIf(ThreeAddressCode* c1, ThreeAddressCode* c2, SymbolTable* table) {
+    ThreeAddressCode* jumpCode = NULL;
+    ThreeAddressCode* labelCode = NULL;
+    Symbol* label = NULL;
+    label = insertLabel(table);
+    jumpCode = createCode(TACJumpF, c1?c1->result:NULL, NULL, label);
+    jumpCode->previous = c1;
+    labelCode = createCode(TACLabel, NULL, NULL, label);
+    labelCode->previous = c2;
+    return joinCodes(jumpCode, labelCode);
+}
+
+ThreeAddressCode* generateIfElse(ThreeAddressCode* c1, ThreeAddressCode* c2, ThreeAddressCode* c3, SymbolTable* table) {
+    ThreeAddressCode* elseLabelCode = NULL;
+    ThreeAddressCode* elseJumpCode = NULL;
+    ThreeAddressCode* ifJumpCode = NULL;
+    ThreeAddressCode* ifLabelCode = NULL;
+
+    Symbol* elseLabel = NULL;
+    Symbol* ifLabel = NULL;
+    elseLabel = insertLabel(table);
+    ifLabel = insertLabel(table);
+
+
+    elseJumpCode = createCode(TACJumpF, c1?c1->result:NULL, NULL, elseLabel);
+    elseJumpCode->previous = c1;
+
+    ifJumpCode = createCode(TACJump, NULL, NULL, ifLabel);
+    ifJumpCode->previous = c2;
+
+    elseLabelCode = createCode(TACLabel, NULL, NULL, elseLabel);
+    
+    ifLabelCode = createCode(TACLabel, NULL, NULL, ifLabel);
+    ifLabelCode->previous = c3;
+
+    return joinCodes(joinCodes(elseJumpCode, ifJumpCode), joinCodes(elseLabelCode, ifLabelCode));
+}
+
+ThreeAddressCode* generateWhile(ThreeAddressCode* c1, ThreeAddressCode* c2, SymbolTable* table) {
+    ThreeAddressCode* loopLabelCode = NULL;
+    ThreeAddressCode* loopJumpCode = NULL;
+    ThreeAddressCode* ifJumpCode = NULL;
+    ThreeAddressCode* ifLabelCode = NULL;
+
+    Symbol* loopLabel = NULL;
+    Symbol* ifLabel = NULL;
+    loopLabel = insertLabel(table);
+    ifLabel = insertLabel(table);
+
+    loopLabelCode = createCode(TACLabel, NULL, NULL, loopLabel);
+    loopLabelCode->previous = c1;
+
+    ifJumpCode = createCode(TACJumpF, c1?c1->result:NULL, NULL, ifLabel);
+
+    loopJumpCode = createCode(TACJump, NULL, NULL, loopLabel);
+    loopJumpCode->previous = c2;
+    
+    ifLabelCode = createCode(TACLabel, NULL, NULL, ifLabel);
+
+    return joinCodes(joinCodes(loopLabelCode, ifJumpCode), joinCodes(loopJumpCode, ifLabelCode));
+}
+
+ThreeAddressCode* generateFunctionCode(Symbol* symbol, ThreeAddressCode* c1) {
+    ThreeAddressCode* functionStart = NULL;
+    ThreeAddressCode* functionEnd = NULL;
+    functionStart = createCode(TACBeginFun, NULL, NULL, symbol);
+    functionEnd = createCode(TACEndFun, NULL, NULL, symbol);
+    functionEnd->previous = c1;
+
+    return joinCodes(functionStart, functionEnd);
 }

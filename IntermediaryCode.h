@@ -11,6 +11,7 @@
 typedef enum three_address_code_type{
     TACSymbol,
     TACMove,
+    TACAccess,
     TACAdd,
     TACSub,
     TACMul,
@@ -28,6 +29,7 @@ typedef enum three_address_code_type{
     TACBeginFun,
     TACEndFun,
     TACJump,
+    TACJumpF,
     TACCall,
     TACArg,
     TACRet,

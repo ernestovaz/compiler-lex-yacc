@@ -23,6 +23,7 @@ typedef struct symbol_table {
 SymbolTable* createSymbolTable();
 Symbol* insertSymbol(SymbolTable* table, char* name, SymbolType type);
 Symbol* insertTemporary(SymbolTable* table);
+Symbol* insertLabel(SymbolTable* table);
 Symbol* getSymbol(SymbolTable* table, char* name);
 void freeSymbolTable(SymbolTable* table);
 void printSymbolTable(SymbolTable* table);
