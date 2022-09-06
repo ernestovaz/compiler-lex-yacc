@@ -93,6 +93,13 @@ Symbol* insertSymbol(SymbolTable* table, char* name, SymbolType type){
     }
 }
 
+Symbol* insertTemporary(SymbolTable* table) {
+    static int id = 0;
+    char name[256] = "";
+    sprintf(name, "$temp%d", id++);
+    return insertSymbol(table, name, SymbolVariable);
+}
+
 Symbol* getSymbol(SymbolTable* table, char* name){
     int index = hashFunction(name);
     SymbolTableNode* node = table->table[index];

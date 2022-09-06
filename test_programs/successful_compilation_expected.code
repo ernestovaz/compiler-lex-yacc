@@ -38,7 +38,7 @@ int main ()
 
   if (a == 15)
     {
-    a <- a + 1;
+    a <- a + 1 + i;
     print "A era=15\n";
     };
     

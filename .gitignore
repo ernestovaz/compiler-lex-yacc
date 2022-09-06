@@ -2,6 +2,9 @@ etapa1
 etapa2 
 etapa3
 etapa4
+etapa5
+etapa6
+etapa7
 lex.yy.c
 lex.yy.h
 y.tab.c

@@ -9,6 +9,7 @@
 
 #include "Decompilation.h"
 #include "SemanticAnalysis.h"
+#include "IntermediaryCode.h"
 
 #include <stdio.h>
 
@@ -99,6 +100,8 @@ int main(int argc, char** argv) {
     decompileAST(syntaxTree, filename);
   }
   analyzeSyntaxTree(syntaxTree);
+  printCodeList(generateCode(syntaxTree, symbolTable));
+
   fprintf(stderr, "Program successfully parsed!\n");
   exit(0);
 }
