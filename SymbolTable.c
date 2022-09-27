@@ -96,14 +96,14 @@ Symbol* insertSymbol(SymbolTable* table, char* name, SymbolType type){
 Symbol* insertTemporary(SymbolTable* table) {
     static int id = 0;
     char name[256] = "";
-    sprintf(name, "$temp%d", id++);
+    sprintf(name, "_temp%d", id++);
     return insertSymbol(table, name, SymbolVariable);
 }
 
 Symbol* insertLabel(SymbolTable* table) {
     static int id = 0;
     char name[256] = "";
-    sprintf(name, "$label%d", id++);
+    sprintf(name, "_label%d", id++);
     return insertSymbol(table, name, SymbolVariable);
 }
 

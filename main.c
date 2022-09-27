@@ -107,7 +107,7 @@ int main(int argc, char** argv) {
   printCodeList(code);
   
   code = reverseCode(code);
-  generateAssembly(code);
+  generateAssembly(code, symbolTable);
 
   exit(0);
 }

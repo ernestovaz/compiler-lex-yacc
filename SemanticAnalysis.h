@@ -30,3 +30,5 @@ DataType getExpressionDataType(SyntaxTreeNode* expressionNode);
 
 DataType dataTypeFromTypeNode(SyntaxTreeNode* node);
 DataType dataTypeFromLiteralNode(SyntaxTreeNode* node);
+
+void addPrefix(Symbol* symbol);

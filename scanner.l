@@ -61,18 +61,22 @@ return                    { return KW_RETURN; }
                             return TK_IDENTIFIER; } 
 
 [0-9]+,[0-9]+             { Symbol* symbol = insertSymbol(symbolTable, yytext, SymbolFloatLiteral); //literals
+                            symbol->dataType = DataTypeFloat;
                             yylval.symbol = symbol;
                             return LIT_FLOAT; } 
 
 [0-9]+                    { Symbol* symbol = insertSymbol(symbolTable, yytext, SymbolIntLiteral);
+                            symbol->dataType = DataTypeInt;
                             yylval.symbol = symbol;
                             return LIT_INTEGER; } 
 
 '([^\'\n\t]|\\'|\\n)'     { Symbol* symbol = insertSymbol(symbolTable, yytext, SymbolCharLiteral); 
+                            symbol->dataType = DataTypeChar;
                             yylval.symbol = symbol;
                             return LIT_CHAR; } 
 
 \"([^\"\n\t]|\\\"|\\n)+\"  { Symbol* symbol = insertSymbol(symbolTable, yytext, SymbolStringLiteral); 
+                            symbol->dataType = DataTypeString;
                             yylval.symbol = symbol;
                             return LIT_STRING; }
 

@@ -3,7 +3,7 @@
 
 #include "SemanticAnalysis.h"
 
-
+#include<string.h>
 #include<stdlib.h>
 
 int errorCount;
@@ -405,6 +405,7 @@ void checkSymbolDeclaration(SyntaxTreeNode* node) {
                 fprintf(stderr, "error: Incompatible value literal specified for variable: %s\n", symbol->name);
                 errorCount++;
             }
+            addPrefix(symbol);
             break;
         case ArrayDefNode:
             symbolType = SymbolArray;
@@ -423,8 +424,16 @@ void checkSymbolDeclaration(SyntaxTreeNode* node) {
                 }
             }
             symbol->arraySize = declaredSize;
+            addPrefix(symbol);
             break;
     }
     symbol->type = symbolType;
     
 };
+
+void addPrefix(Symbol* symbol) {
+    char* prefixed = malloc(strlen(symbol->name)+5+1);
+    strcpy(prefixed, "_var_");
+    strcat(prefixed, symbol->name);
+    symbol->name = prefixed;
+}

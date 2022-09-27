@@ -1,7 +1,6 @@
+int mario(1);
+int marcos(333);
+
 int main(){
-    
-}
-
-float function(){
-
+    print 12 231 "alajal" "\n" 'a' '\n';
 }
