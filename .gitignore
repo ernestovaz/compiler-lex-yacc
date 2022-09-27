@@ -16,3 +16,4 @@ output.txt
 .idea/.gitignore
 .idea/misc.xml
 .idea/vcs.xml
+out.s

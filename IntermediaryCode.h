@@ -47,8 +47,9 @@ typedef struct three_address_code{
 } ThreeAddressCode;
 
 ThreeAddressCode* createCode(ThreeAddressCodeType type, Symbol* op1, Symbol* op2, Symbol* res);
+ThreeAddressCode* joinCodes(ThreeAddressCode* c1, ThreeAddressCode* c2);
+ThreeAddressCode* generateCode(SyntaxTreeNode* node, SymbolTable* table);
+ThreeAddressCode* reverseCode(ThreeAddressCode* code);
+
 void printCode(ThreeAddressCode* code);
 void printCodeList(ThreeAddressCode* code);
-ThreeAddressCode* joinCodes(ThreeAddressCode* c1, ThreeAddressCode* c2);
-
-ThreeAddressCode* generateCode(SyntaxTreeNode* node, SymbolTable* table);

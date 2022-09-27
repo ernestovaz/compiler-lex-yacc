@@ -2,6 +2,16 @@
 
 #include <stdlib.h>
 
+ThreeAddressCode* generateBinaryOperationCode(ThreeAddressCodeType type, ThreeAddressCode* op1, ThreeAddressCode* op2, SymbolTable* table);
+ThreeAddressCode* generateUnaryOperationCode(ThreeAddressCodeType type, ThreeAddressCode* op, SymbolTable* table);
+ThreeAddressCode* generateAccessCode(Symbol* symbol, ThreeAddressCode* index, SymbolTable* table);
+ThreeAddressCode* generateFunctionCode(Symbol* symbol, ThreeAddressCode* c1);
+ThreeAddressCode* generateIfElse(ThreeAddressCode* c1, ThreeAddressCode* c2, ThreeAddressCode* c3, SymbolTable* table);
+ThreeAddressCode* generateIf(ThreeAddressCode* c1, ThreeAddressCode* c2, SymbolTable* table);
+ThreeAddressCode* generateWhile(ThreeAddressCode* c1, ThreeAddressCode* c2, SymbolTable* table);
+ThreeAddressCode* generateMoveCode(ThreeAddressCode* c1, ThreeAddressCode* c2);
+ThreeAddressCode* generateWhile(ThreeAddressCode* c1, ThreeAddressCode* c2, SymbolTable* table);
+
 ThreeAddressCode* createCode(
     ThreeAddressCodeType type, 
     Symbol* op1, 
@@ -20,112 +30,6 @@ ThreeAddressCode* createCode(
     return code;
 }
 
-void printCode(ThreeAddressCode* code) {
-    if(code != NULL && code->type != TACSymbol) {
-        fprintf(stderr,"TAC_");
-        switch(code->type) {
-            case TACSymbol:
-                fprintf(stderr,"SYMBOL");
-                break;
-            case TACMove:
-                fprintf(stderr,"MOVE");
-                break;
-            case TACAccess:
-                fprintf(stderr,"ACCESS");
-                break;
-            case TACAdd:
-                fprintf(stderr,"ADD");
-                break;
-            case TACSub:
-                fprintf(stderr,"SUB");
-                break;
-            case TACMul:
-                fprintf(stderr,"MUL");
-                break;
-            case TACDiv:
-                fprintf(stderr,"DIV");
-                break;
-            case TACNeg:
-                fprintf(stderr,"NEG");
-                break;
-            case TACLess:
-                fprintf(stderr,"LESS");
-                break;
-            case TACGreater:
-                fprintf(stderr,"GREATER");
-                break;
-            case TACAnd:
-                fprintf(stderr,"AND");
-                break;
-            case TACOr:
-                fprintf(stderr,"OR");
-                break;
-            case TACLeq:
-                fprintf(stderr,"LEQ");
-                break;
-            case TACGeq:
-                fprintf(stderr,"GEQ");
-                break;
-            case TACEq:
-                fprintf(stderr,"EQ");
-                break;
-            case TACDif:
-                fprintf(stderr,"Dif");
-                break;
-            case TACLabel:
-                fprintf(stderr,"LABEL");
-                break;
-            case TACBeginFun:
-                fprintf(stderr,"BEGIN_FUN");
-                break;
-            case TACEndFun:
-                fprintf(stderr,"END_FUN");
-                break;
-            case TACJump:
-                fprintf(stderr,"JUMP");
-                break;
-            case TACJumpF:
-                fprintf(stderr,"JUMPF");
-                break;
-            case TACCall:
-                fprintf(stderr,"CALL");
-                break;
-            case TACArg:
-                fprintf(stderr,"ARG");
-                break;
-            case TACRet:
-                fprintf(stderr,"RET");
-                break;
-            case TACPrint:
-                fprintf(stderr,"PRINT");
-                break;
-            case TACRead:
-                fprintf(stderr,"READ");
-                break;
-        }
-        fprintf(stderr, "(");
-
-        if(code->operator1 != NULL) fprintf(stderr, "%s", code->operator1->name);
-        
-        fprintf(stderr,",");
-
-        if(code->operator2 != NULL) fprintf(stderr, "%s", code->operator2->name);
-
-        fprintf(stderr,",");
-
-        if(code->result != NULL) fprintf(stderr, "%s", code->result->name);
-
-        fprintf(stderr,")\n");
-    }
-}
-
-void printCodeList(ThreeAddressCode* code){
-    if(code != NULL) {
-        printCodeList(code->previous);
-        printCode(code);
-    }
-}
-
 ThreeAddressCode* joinCodes(ThreeAddressCode* c1, ThreeAddressCode* c2) {
     if(c1 == NULL) return c2;
     if(c2 == NULL) return c1;
@@ -137,15 +41,6 @@ ThreeAddressCode* joinCodes(ThreeAddressCode* c1, ThreeAddressCode* c2) {
     return c2;
 }
 
-ThreeAddressCode* generateBinaryOperationCode(ThreeAddressCodeType type, ThreeAddressCode* op1, ThreeAddressCode* op2, SymbolTable* table);
-ThreeAddressCode* generateUnaryOperationCode(ThreeAddressCodeType type, ThreeAddressCode* op, SymbolTable* table);
-ThreeAddressCode* generateAccessCode(Symbol* symbol, ThreeAddressCode* index, SymbolTable* table);
-ThreeAddressCode* generateFunctionCode(Symbol* symbol, ThreeAddressCode* c1);
-ThreeAddressCode* generateIfElse(ThreeAddressCode* c1, ThreeAddressCode* c2, ThreeAddressCode* c3, SymbolTable* table);
-ThreeAddressCode* generateIf(ThreeAddressCode* c1, ThreeAddressCode* c2, SymbolTable* table);
-ThreeAddressCode* generateWhile(ThreeAddressCode* c1, ThreeAddressCode* c2, SymbolTable* table);
-ThreeAddressCode* generateMoveCode(ThreeAddressCode* c1, ThreeAddressCode* c2);
-ThreeAddressCode* generateWhile(ThreeAddressCode* c1, ThreeAddressCode* c2, SymbolTable* table);
 
 ThreeAddressCode* generateCode(SyntaxTreeNode* node, SymbolTable* table){
     ThreeAddressCode* result = NULL;
@@ -378,4 +273,118 @@ ThreeAddressCode* generateFunctionCode(Symbol* symbol, ThreeAddressCode* c1) {
     functionEnd->previous = c1;
 
     return joinCodes(functionStart, functionEnd);
+}
+
+ThreeAddressCode* reverseCode(ThreeAddressCode* last){
+    ThreeAddressCode* ptr;
+    for(ptr = last; ptr->previous; ptr = ptr->previous)
+        ptr->previous->next = ptr;
+
+    return ptr;
+}
+
+void printCode(ThreeAddressCode* code) {
+    if(code != NULL && code->type != TACSymbol) {
+        fprintf(stderr,"TAC_");
+        switch(code->type) {
+            case TACSymbol:
+                fprintf(stderr,"SYMBOL");
+                break;
+            case TACMove:
+                fprintf(stderr,"MOVE");
+                break;
+            case TACAccess:
+                fprintf(stderr,"ACCESS");
+                break;
+            case TACAdd:
+                fprintf(stderr,"ADD");
+                break;
+            case TACSub:
+                fprintf(stderr,"SUB");
+                break;
+            case TACMul:
+                fprintf(stderr,"MUL");
+                break;
+            case TACDiv:
+                fprintf(stderr,"DIV");
+                break;
+            case TACNeg:
+                fprintf(stderr,"NEG");
+                break;
+            case TACLess:
+                fprintf(stderr,"LESS");
+                break;
+            case TACGreater:
+                fprintf(stderr,"GREATER");
+                break;
+            case TACAnd:
+                fprintf(stderr,"AND");
+                break;
+            case TACOr:
+                fprintf(stderr,"OR");
+                break;
+            case TACLeq:
+                fprintf(stderr,"LEQ");
+                break;
+            case TACGeq:
+                fprintf(stderr,"GEQ");
+                break;
+            case TACEq:
+                fprintf(stderr,"EQ");
+                break;
+            case TACDif:
+                fprintf(stderr,"Dif");
+                break;
+            case TACLabel:
+                fprintf(stderr,"LABEL");
+                break;
+            case TACBeginFun:
+                fprintf(stderr,"BEGIN_FUN");
+                break;
+            case TACEndFun:
+                fprintf(stderr,"END_FUN");
+                break;
+            case TACJump:
+                fprintf(stderr,"JUMP");
+                break;
+            case TACJumpF:
+                fprintf(stderr,"JUMPF");
+                break;
+            case TACCall:
+                fprintf(stderr,"CALL");
+                break;
+            case TACArg:
+                fprintf(stderr,"ARG");
+                break;
+            case TACRet:
+                fprintf(stderr,"RET");
+                break;
+            case TACPrint:
+                fprintf(stderr,"PRINT");
+                break;
+            case TACRead:
+                fprintf(stderr,"READ");
+                break;
+        }
+        fprintf(stderr, "(");
+
+        if(code->operator1 != NULL) fprintf(stderr, "%s", code->operator1->name);
+        
+        fprintf(stderr,",");
+
+        if(code->operator2 != NULL) fprintf(stderr, "%s", code->operator2->name);
+
+        fprintf(stderr,",");
+
+        if(code->result != NULL) fprintf(stderr, "%s", code->result->name);
+
+        fprintf(stderr,")\n");
+    }
+}
+
+void printCodeList(ThreeAddressCode* code){
+    if(code != NULL) {
+        printCodeList(code->previous);
+        printCode(code);
+    }
 }

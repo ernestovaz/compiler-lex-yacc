@@ -10,6 +10,7 @@
 #include "Decompilation.h"
 #include "SemanticAnalysis.h"
 #include "IntermediaryCode.h"
+#include "AssemblyGeneration.h"
 
 #include <stdio.h>
 
@@ -100,8 +101,13 @@ int main(int argc, char** argv) {
     decompileAST(syntaxTree, filename);
   }
   analyzeSyntaxTree(syntaxTree);
-  printCodeList(generateCode(syntaxTree, symbolTable));
-
   fprintf(stderr, "Program successfully parsed!\n");
+
+  ThreeAddressCode* code = generateCode(syntaxTree, symbolTable);
+  printCodeList(code);
+  
+  code = reverseCode(code);
+  generateAssembly(code);
+
   exit(0);
 }

@@ -1,5 +1,5 @@
-etapa5: y.tab.c lex.yy.c
-	gcc -o etapa5 lex.yy.c main.c SymbolTable.c AbstractSyntaxTree.c Decompilation.c SemanticAnalysis.c IntermediaryCode.c
+etapa6: y.tab.c lex.yy.c
+	gcc -o etapa6 lex.yy.c main.c SymbolTable.c AbstractSyntaxTree.c Decompilation.c SemanticAnalysis.c IntermediaryCode.c AssemblyGeneration.c
 
 y.tab.c: parser.y
 	yacc -d parser.y
@@ -9,12 +9,12 @@ lex.yy.c: scanner.l
 
 .PHONY: run test
 clean:
-	rm -f lex.yy.c lex.yy.h y.tab.c y.tab.h etapa5
+	rm -f lex.yy.c lex.yy.h y.tab.c y.tab.h etapa6
 
-run: etapa5
-	./etapa5
+run: etapa6
+	./etapa6
 
-test: etapa5
+test: etapa6
 	@echo
 	for test_file in test_programs/*.code;\
 	do\
