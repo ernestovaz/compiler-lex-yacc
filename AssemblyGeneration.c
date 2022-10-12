@@ -80,6 +80,70 @@ void generateAddAssembly(ThreeAddressCode* code, FILE* file){
     free(var3);
 }
 
+void generateSubAssembly(ThreeAddressCode* code, FILE* file){
+    char *var1, *var2, *var3;
+    var1 = getLabelName(code->operator1->name, code->operator1->dataType);
+    var2 = getLabelName(code->operator2->name, code->operator2->dataType);
+    var3 = getLabelName(code->result->name, code->result->dataType);
+    fprintf(file, 
+        "#subtract                  \n"
+        "movl	%s(%%rip), %%eax    \n"
+        "movl 	%s(%%rip), %%edx    \n"
+        "subl 	%%edx, %%eax        \n"
+        "movl	%%eax, %s(%%rip)    \n"
+        "                           \n",
+        var1,
+        var2,
+        var3
+    );
+    free(var1);
+    free(var2);
+    free(var3);
+}
+
+void generateProdAssembly(ThreeAddressCode* code, FILE* file){
+    char *var1, *var2, *var3;
+    var1 = getLabelName(code->operator1->name, code->operator1->dataType);
+    var2 = getLabelName(code->operator2->name, code->operator2->dataType);
+    var3 = getLabelName(code->result->name, code->result->dataType);
+    fprintf(file, 
+        "#multiplication            \n"
+        "movl	%s(%%rip), %%eax    \n"
+        "movl 	%s(%%rip), %%edx    \n"
+        "imull 	%%edx, %%eax        \n"
+        "movl	%%eax, %s(%%rip)    \n"
+        "                           \n",
+        var1,
+        var2,
+        var3
+    );
+    free(var1);
+    free(var2);
+    free(var3);
+}
+
+void generateDivAssembly(ThreeAddressCode* code, FILE* file){
+    char *var1, *var2, *var3;
+    var1 = getLabelName(code->operator1->name, code->operator1->dataType);
+    var2 = getLabelName(code->operator2->name, code->operator2->dataType);
+    var3 = getLabelName(code->result->name, code->result->dataType);
+    fprintf(file, 
+        "#division                  \n"
+        "movl	%s(%%rip), %%eax    \n"
+        "movl 	%s(%%rip), %%ecx    \n"
+        "cltd                       \n"
+        "idivl 	%%ecx               \n"
+        "movl	%%eax, %s(%%rip)    \n"
+        "                           \n",
+        var1,
+        var2,
+        var3
+    );
+    free(var1);
+    free(var2);
+    free(var3);
+}
+
 void generatePrintAssembly(char* label, DataType type, FILE* file){
     const char* data;
     if(type == DataTypeString) data = label;
@@ -169,6 +233,15 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
                 break;
             case TACMove:
                 generateMoveAssembly(ptr, file);
+                break;
+            case TACSub:
+                generateSubAssembly(ptr, file);
+                break;
+            case TACMul:
+                generateProdAssembly(ptr, file);
+                break;
+            case TACDiv:
+                generateDivAssembly(ptr,file);
                 break;
         }
     }

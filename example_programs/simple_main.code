@@ -1,7 +1,5 @@
-incit henrique(2);
-int maurio(4);
-int paulo(8);
+int mauro(5);
+int jonas(7);
 int main() {
-    paulo <- mauricio + henrique;
-    print paulo;
+    print jonas.mauro "\n";
 }
