@@ -43,6 +43,22 @@ const char* stringForData(DataType type){
     return "";
 }
 
+void generateMoveAssembly(ThreeAddressCode* code, FILE* file){
+    char *var1, *var2;
+    var1 = getLabelName(code->operator1->name, code->operator1->dataType);
+    var2 = getLabelName(code->result->name, code->result->dataType);
+    fprintf(file, 
+        "#assignment                \n"
+        "movl	%s(%%rip), %%edx    \n"
+        "movl	%%edx, %s(%%rip)    \n"
+        "                           \n",
+        var1,
+        var2
+    );
+    free(var1);
+    free(var2);
+}
+
 void generateAddAssembly(ThreeAddressCode* code, FILE* file){
     char *var1, *var2, *var3;
     var1 = getLabelName(code->operator1->name, code->operator1->dataType);
@@ -150,6 +166,9 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
                 break;
             case TACAdd:
                 generateAddAssembly(ptr, file);
+                break;
+            case TACMove:
+                generateMoveAssembly(ptr, file);
                 break;
         }
     }
