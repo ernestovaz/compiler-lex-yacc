@@ -1,4 +1,5 @@
-float marcos(2,0);
+int henrique(2);
+int mauricio(4);
 int main() {
-    print 2,0 " é um número " 45 'x' " mais daora \n" marcos "\n"
+    print henrique+mauricio "\n" henrique mauricio henrique+mauricio;
 }

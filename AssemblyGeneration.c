@@ -43,6 +43,27 @@ const char* stringForData(DataType type){
     return "";
 }
 
+void generateAddAssembly(ThreeAddressCode* code, FILE* file){
+    char *var1, *var2, *var3;
+    var1 = getLabelName(code->operator1->name, code->operator1->dataType);
+    var2 = getLabelName(code->operator2->name, code->operator2->dataType);
+    var3 = getLabelName(code->result->name, code->result->dataType);
+    fprintf(file, 
+        "#add                       \n"
+        "movl	%s(%%rip), %%edx    \n"
+        "movl 	%s(%%rip), %%eax    \n"
+        "addl 	%%edx, %%eax        \n"
+        "movl	%%eax, %s(%%rip)    \n"
+        "                           \n",
+        var1,
+        var2,
+        var3
+    );
+    free(var1);
+    free(var2);
+    free(var3);
+}
+
 void generatePrintAssembly(char* label, DataType type, FILE* file){
     const char* data;
     if(type == DataTypeString) data = label;
@@ -127,6 +148,9 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
                 generatePrintAssembly(label, type, file);
                 free(label);
                 break;
+            case TACAdd:
+                generateAddAssembly(ptr, file);
+                break;
         }
     }
     
@@ -138,7 +162,7 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
 
 void generateSymbolTableAssembly(SymbolTable* table, FILE* file){
     SymbolTableNode* node;
-    fprintf(file, "#symbol table labels \n");
+    fprintf(file, "#symbol table labels \n.data\n");
     for(int i=0; i<table->size; i++){
         for(node=table->table[i]; node; node = node->next){
             SymbolType symbolType = node->symbol->type;
@@ -155,9 +179,14 @@ void generateSymbolTableAssembly(SymbolTable* table, FILE* file){
                 
                 //value
                 if(symbolType == SymbolVariable){
-                    char* initialValue = node->symbol->initialValue->name;
-                    value   = (char*) malloc(strlen(initialValue)+1);
-                    value = strcpy(value, initialValue);  
+                    if(node->symbol->initialValue){
+                        char* initialValue = node->symbol->initialValue->name;
+                        value   = (char*) malloc(strlen(initialValue)+1);
+                        value = strcpy(value, initialValue);  
+                    } else {
+                        value   = (char*) malloc(2);
+                        value = strcpy(value, "0");
+                    }
                 } else { //else is literal
                     value   = (char*) malloc(strlen(name)+1);
                     strcpy(value, name); 

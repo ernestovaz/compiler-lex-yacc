@@ -93,11 +93,13 @@ Symbol* insertSymbol(SymbolTable* table, char* name, SymbolType type){
     }
 }
 
-Symbol* insertTemporary(SymbolTable* table) {
+Symbol* insertTemporary(SymbolTable* table, DataType type) {
     static int id = 0;
     char name[256] = "";
     sprintf(name, "_temp%d", id++);
-    return insertSymbol(table, name, SymbolVariable);
+    Symbol* symbol = insertSymbol(table, name, SymbolVariable);
+    symbol->dataType = type;
+    return symbol;
 }
 
 Symbol* insertLabel(SymbolTable* table) {

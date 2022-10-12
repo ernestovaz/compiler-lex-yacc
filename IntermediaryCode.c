@@ -96,7 +96,7 @@ ThreeAddressCode* generateCode(SyntaxTreeNode* node, SymbolTable* table){
                 break;
                 
             case FunctionNode:
-                result = joinCodes(subtrees[0], createCode(TACCall, node->symbol, NULL, insertTemporary(table)));
+                result = joinCodes(subtrees[0], createCode(TACCall, node->symbol, NULL, insertTemporary(table, node->symbol->dataType)));
                 break;
             
             case ExpressionListNode:
@@ -161,7 +161,7 @@ ThreeAddressCode* generateBinaryOperationCode(ThreeAddressCodeType type, ThreeAd
             type, 
             op1?op1->result:NULL, 
             op2?op2->result:NULL, 
-            insertTemporary(table)
+            insertTemporary(table, op1->result->dataType)
         )
     );
 }
@@ -173,7 +173,7 @@ ThreeAddressCode* generateUnaryOperationCode(ThreeAddressCodeType type, ThreeAdd
             type, 
             op?op->result:NULL, 
             NULL, 
-            insertTemporary(table)
+            insertTemporary(table, op->result->dataType)
         )
     );
 }
@@ -198,7 +198,7 @@ ThreeAddressCode* generateAccessCode(Symbol* symbol, ThreeAddressCode* index, Sy
             TACAccess, 
             symbol,
             index?index->result:NULL, 
-            insertTemporary(table)
+            insertTemporary(table, symbol->dataType)
         )
     );
 }
