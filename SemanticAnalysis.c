@@ -405,6 +405,7 @@ void checkSymbolDeclaration(SyntaxTreeNode* node) {
                 fprintf(stderr, "error: Incompatible value literal specified for variable: %s\n", symbol->name);
                 errorCount++;
             }
+            symbol->initialValue = node->children[1]->symbol;                
             addPrefix(symbol);
             break;
         case ArrayDefNode:

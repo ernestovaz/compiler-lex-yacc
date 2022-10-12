@@ -148,15 +148,20 @@ void generateSymbolTableAssembly(SymbolTable* table, FILE* file){
             if(symbolType != SymbolFunction && symbolType != SymbolArray){
                 char *name, *value, *type; 
                 name    = (char*) malloc(strlen(node->symbol->name)+1);
-                value   = (char*) malloc(strlen(node->symbol->name)+1);
                 type    = (char*) malloc(7);
 
                 //name
                 strcpy(name, node->symbol->name);
                 
                 //value
-                if(symbolType == SymbolVariable) value = strcpy(value, "0");
-                else strcpy(value, name); //else is literal
+                if(symbolType == SymbolVariable){
+                    char* initialValue = node->symbol->initialValue->name;
+                    value   = (char*) malloc(strlen(initialValue)+1);
+                    value = strcpy(value, initialValue);  
+                } else { //else is literal
+                    value   = (char*) malloc(strlen(name)+1);
+                    strcpy(value, name); 
+                } 
                 if(dataType == DataTypeFloat){
                     replaceDecimalSeparator(name, '_');
                     replaceDecimalSeparator(value, '.');

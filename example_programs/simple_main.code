@@ -1,3 +1,4 @@
+float marcos(2,0);
 int main() {
-    print 2,0 " é um número " 45 'x' " mais daora \n"
+    print 2,0 " é um número " 45 'x' " mais daora \n" marcos "\n"
 }
