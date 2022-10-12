@@ -10,9 +10,9 @@ void replaceDecimalSeparator(char* number, char separator){
     *comma = separator;
 }
 
-void replaceQuotationMarks(char* string){
+void reformatString(char* string){
     for(int i=0; i<strlen(string); i++){
-        if(string[i] == '"' || string[i] == '\\') string[i] = '_';
+        if(string[i] == '"' || string[i] == '\\' || string[i] == ' ') string[i] = '_';
     }
 }
 
@@ -21,7 +21,7 @@ char* getLabelName(char* name, DataType type){
     strcpy(copy, name);
 
     if(type == DataTypeFloat) replaceDecimalSeparator(copy, '_');
-    else if(type == DataTypeString) replaceQuotationMarks(copy);
+    else if(type == DataTypeString) reformatString(copy);
 
     memmove(copy + 1, copy, strlen(copy)+1); 
     copy[0] = '_';
@@ -43,6 +43,41 @@ const char* stringForData(DataType type){
     return "";
 }
 
+void generatePrintAssembly(char* label, DataType type, FILE* file){
+    const char* data;
+    if(type == DataTypeString) data = label;
+    else data = stringForData(type);
+
+    if(type != DataTypeFloat){
+        fprintf(file, 
+            "#print                     \n"
+            "leaq	%s(%%rip), %%rax    \n"
+            "movl	%s(%%rip), %%esi    \n"
+            "movq	%%rax, %%rdi        \n"
+            "call	printf@PLT          \n"
+            "                           \n",
+            data,
+            label
+        );
+    } else {
+        fprintf(file, 
+            "#load floating point               \n"
+            "movss	%s(%%rip), %%xmm0           \n"
+            "                                   \n"
+            "#print floating point              \n"
+            "cvtss2sd %%xmm0, %%xmm1            \n"
+            "movq	%%xmm1, %%rax               \n"
+            "movq	%%rax, %%xmm0               \n"
+            "leaq	%s(%%rip), %%rax            \n"
+            "movq	%%rax, %%rdi                \n"
+            "call	printf@PLT                  \n"
+            "                                   \n",
+            label,
+            data
+        );
+    }
+}
+
 void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
     FILE* file;
     file = fopen("out.s", "w");
@@ -50,14 +85,16 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
     
     //Start
     fprintf(file,
+        "#template strings      \n"
         "int_string:            \n"
-        "	.string	\"%%d\"  \n"
+        "	.string	\"%%d\"     \n"
         "float_string:          \n"
-        "	.string \"%%f\"  \n"
+        "	.string \"%%f\"     \n"
         "char_string:           \n"
-        "	.string \"%%c\"  \n"
+        "	.string \"%%c\"     \n"
         "text_string:           \n"
-        "	.string \"%%s\"  \n"
+        "	.string \"%%s\"     \n"
+        "                       \n"
     );
 
     //Each Three Address Code
@@ -66,35 +103,28 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
         switch(ptr->type){
             case TACBeginFun:
                 fprintf(file,
+                    "#function start      \n"
                     ".globl	%s            \n"
                     "%s:                  \n"
                     "pushq	%%rbp         \n"
-                    "movq	%%rsp, %%rbp  \n",
+                    "movq	%%rsp, %%rbp  \n"
+                    "                     \n",
                     ptr->result->name,
                     ptr->result->name
                 );
                 break;
             case TACEndFun:
                 fprintf(file, 
+                    "#function end  \n"
                     "popq	%%rbp   \n"
                     "ret            \n"
+                    "               \n"
                 );
                 break;
             case TACPrint:
                 DataType type = ptr->result->dataType;
                 char* label = getLabelName(ptr->result->name, type);
-
-                const char* data;
-                if(type == DataTypeString) data = label;
-                else data = stringForData(type);
-                fprintf(file, 
-                    "leaq	%s(%%rip), %%rax    \n"
-                    "movl	%s(%%rip), %%esi   \n"
-                    "movq	%%rax, %%rdi        \n"
-                    "call	printf@PLT          \n",
-                    data,
-                    label
-                );
+                generatePrintAssembly(label, type, file);
                 free(label);
                 break;
         }
@@ -108,6 +138,7 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
 
 void generateSymbolTableAssembly(SymbolTable* table, FILE* file){
     SymbolTableNode* node;
+    fprintf(file, "#symbol table labels \n");
     for(int i=0; i<table->size; i++){
         for(node=table->table[i]; node; node = node->next){
             SymbolType symbolType = node->symbol->type;
@@ -132,7 +163,7 @@ void generateSymbolTableAssembly(SymbolTable* table, FILE* file){
                     strcpy(type, "float");
                 }
                 else if(dataType == DataTypeString){
-                    replaceQuotationMarks(name);
+                    reformatString(name);
                     strcpy(type, "string");
                 } else{
                     strcpy(type, "long");

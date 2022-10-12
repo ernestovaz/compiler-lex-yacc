@@ -1,6 +1,3 @@
-int mario(1);
-int marcos(333);
-
-int main(){
-    print 12 231 "alajal" "\n" 'a' '\n';
+int main() {
+    print 2,0 " é um número " 45 'x' " mais daora \n"
 }
