@@ -7,7 +7,7 @@ void replaceDecimalSeparator(char* number, char separator){
     char* comma = strchr(number, ','); 
 
     //strchr returns pointer to first occurence
-    *comma = separator;
+    if(comma) *comma = separator;
 }
 
 void reformatString(char* string){
