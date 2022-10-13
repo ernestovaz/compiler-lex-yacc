@@ -1,0 +1,58 @@
+## UFRGS - Compiladores - Marcelo Johann - 2022/1
+
+char c ('x');
+char d (100);
+int a ('A');
+int i(1);
+int v[10] 'a' 0 0 0 0 0 0 0 0 0;
+int matrix[100]; 
+float f (2,5);
+
+\#
+This is a comment 
+of multiple lines
+#\
+
+int main ()
+  {
+  a <- 0;
+  a <- a - i;
+  a <- 5;
+  v[a] <- 55;
+  print v[5];
+  print a;
+  i <- 2;
+
+  print "Digite um numero: \n";
+  read a;
+  print "Digite mais um numero: \n";
+  read v[a];
+
+  while (i<10)
+    {
+    i <- incn(i 1);
+    a <- incn(a a);
+    };
+
+  print "Incrementado algumas vezes a fica " (2+x)a "\n";
+
+  if (a == 15)
+    {
+    a <- a + 1 + i;
+    print "A era=15\n";
+    };
+    
+  if (i==100)
+    {
+    print "Nao tem como isso...\n"
+    }
+  else
+    print "OK!\n"; {{}}
+  }
+
+int incn (int x int n )
+  {
+  return x + n
+  }
+
+## end of file
