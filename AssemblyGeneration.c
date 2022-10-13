@@ -120,8 +120,8 @@ void generateSubAssembly(ThreeAddressCode* code, FILE* file){
     }
     else {
         fprintf(file, 
-            "movl	%s(%%rip), %%eax    \n"
-            "movl 	%s(%%rip), %%edx    \n"
+            "movl	%s(%%rip), %%edx    \n"
+            "movl 	%s(%%rip), %%eax    \n"
             "subl 	%%edx, %%eax        \n"
             "movl	%%eax, %s(%%rip)    \n",
             var1,
@@ -339,6 +339,51 @@ void generateGreaterAssembly(ThreeAddressCode* code, FILE* file) {
     free(var3);
 }
 
+void generateLessAssembly(ThreeAddressCode* code, FILE* file) {
+    char *var1, *var2, *var3;
+    var1 = getLabelName(code->operator1->name, code->operator1->dataType);
+    var2 = getLabelName(code->operator2->name, code->operator2->dataType);
+    var3 = getLabelName(code->result->name, code->result->dataType);
+    DataType type = code->operator1->dataType;
+    fprintf(file,
+        "#less than       \n"
+        "movl $0, %s(%%rip)  \n", 
+        var3
+    );
+    if(type == DataTypeFloat){
+        fprintf(file,
+            "movss %s(%%rip), %%xmm0\n"
+            "movss %s(%%rip), %%xmm1\n"
+            "comiss %%xmm0, %%xmm1  \n"
+            "jae .L%d             \n",
+            var2,
+            var1,
+            g_labelCount
+        );
+    } else {
+        fprintf(file,
+            "movl %s(%%rip), %%eax\n"
+            "movl %s(%%rip), %%edx\n"
+            "cmpl %%eax, %%edx    \n"
+            "jge .L%d             \n",
+            var2,
+            var1,
+            g_labelCount
+        );
+    }
+    fprintf(file,
+        "movl $1, %s(%%rip)  \n"
+        ".L%d:               \n"  
+        "                    \n",
+        var3,
+        g_labelCount
+    );
+    g_labelCount++;
+    free(var1);
+    free(var2);
+    free(var3);
+}
+
 void genereateIfAssembly(ThreeAddressCode* code, FILE* file){
     char *var1, *var2;
     var1 = getLabelName(code->operator1->name, code->operator1->dataType);
@@ -494,6 +539,9 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
                 break;
             case TACGreater:
                 generateGreaterAssembly(ptr, file);
+                break;
+            case TACLess:
+                generateLessAssembly(ptr, file);
                 break;
             case TACJumpF:
                 genereateIfAssembly(ptr, file);
