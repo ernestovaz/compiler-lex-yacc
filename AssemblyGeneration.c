@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+int g_functionNumber = 1;
+
 //Replace comma decimal separator with a dot
 void replaceDecimalSeparator(char* number, char separator){
     char* comma = strchr(number, ','); 
@@ -12,7 +14,7 @@ void replaceDecimalSeparator(char* number, char separator){
 
 void reformatString(char* string){
     for(int i=0; i<strlen(string); i++){
-        if(string[i] == '"' || string[i] == '\\' || string[i] == ' ') string[i] = '_';
+        if(string[i] == '"' || string[i] == '\\' || string[i] == ' ' || string[i] == '!') string[i] = '_';
     }
 }
 
@@ -144,8 +146,6 @@ void generateDivAssembly(ThreeAddressCode* code, FILE* file){
     free(var3);
 }
 
-
-
 void generatePrintAssembly(char* label, DataType type, FILE* file){
     const char* data;
     if(type == DataTypeString) data = label;
@@ -197,7 +197,41 @@ void generateReadAssembly(char* label, DataType type, FILE* file){
     label,
     data
     );
+}
 
+void generateCallAssembly(ThreeAddressCode* code, FILE* file){
+    fprintf(file,
+        "#function call       \n"
+        "movl $0, %%eax       \n"
+        "call %s              \n",
+        code->operator1->name
+    );
+    if(code->result){
+        char* label = getLabelName(code->result->name, code->result->dataType);
+        fprintf(file,
+            "movl %%eax, %s(%%rip)\n",
+            label
+        );
+        free(label);
+    }
+    fprintf(file,
+        "movl $0, %%eax       \n"
+        "                     \n"
+    );
+}
+
+
+void generateReturnAssembly(ThreeAddressCode* code, FILE* file) {
+    char* label = getLabelName(code->result->name, code->result->dataType);
+    fprintf(file,
+        "#return                \n"
+        "movl %s(%%rip), %%eax  \n"
+        "jmp .END%d             \n"
+        "                       \n",
+        label,
+        g_functionNumber
+    );
+    free(label);
 }
 
 void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
@@ -237,11 +271,14 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
                 break;
             case TACEndFun:
                 fprintf(file, 
-                    "#function end  \n"
-                    "popq	%%rbp   \n"
-                    "ret            \n"
-                    "               \n"
+                    "#function end      \n"
+                    ".END%d:  \n"
+                    "popq	%%rbp       \n"
+                    "ret                \n"
+                    "                   \n",
+                    g_functionNumber
                 );
+                g_functionNumber++;
                 break;
             case TACPrint:{
                 DataType type = ptr->result->dataType;
@@ -271,6 +308,13 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
                 generateReadAssembly(label, type, file);
                 free(label);
             }
+                break;
+            case TACCall:
+                generateCallAssembly(ptr, file);
+                break;
+            case TACRet:
+                generateReturnAssembly(ptr, file);
+                break;
         }
     }
     

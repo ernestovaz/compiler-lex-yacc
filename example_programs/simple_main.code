@@ -1,6 +1,14 @@
 int jonas(7);
+float scooby_doo(2,2);
 int main() {
-    print jonas;
-    read jonas;
-    print jonas;
+    print ricco() "\n";
+}
+
+int marcos(){
+}
+
+int ricco (){
+    print "welcome to st tropez\n";
+    return 2;
+    print "caramba!!!";
 }
