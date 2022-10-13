@@ -1,11 +1,11 @@
-int jonas(7);
+float six(6,0);
+float two(2,0);
+float number(0,0);
+
 int main() {
-    jonas <- 0;
-    if(jonas>0){
-        print "caramba!";
-    };
-    jonas <- 1;
-    if(jonas>0){
-        print "not caramba!";
-    };
+    print scooby_doo()/two;
+}
+
+float scooby_doo(){
+    return 8,00;
 }

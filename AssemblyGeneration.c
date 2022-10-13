@@ -69,17 +69,31 @@ void generateAddAssembly(ThreeAddressCode* code, FILE* file){
     var1 = getLabelName(code->operator1->name, code->operator1->dataType);
     var2 = getLabelName(code->operator2->name, code->operator2->dataType);
     var3 = getLabelName(code->result->name, code->result->dataType);
-    fprintf(file, 
-        "#add                       \n"
-        "movl	%s(%%rip), %%edx    \n"
-        "movl 	%s(%%rip), %%eax    \n"
-        "addl 	%%edx, %%eax        \n"
-        "movl	%%eax, %s(%%rip)    \n"
-        "                           \n",
-        var1,
-        var2,
-        var3
-    );
+    DataType type = code->result->dataType;
+    fprintf(file, "#add\n");
+    if(type == DataTypeFloat){
+        fprintf(file,        
+            "movss	%s(%%rip), %%xmm1    \n"
+            "movss 	%s(%%rip), %%xmm0    \n"
+            "addss	%%xmm1, %%xmm0       \n"
+            "movss 	%%xmm0, %s(%%rip)    \n",
+            var1,
+            var2,
+            var3
+        );
+    }
+    else{
+        fprintf(file, 
+            "movl	%s(%%rip), %%edx    \n"
+            "movl 	%s(%%rip), %%eax    \n"
+            "addl 	%%edx, %%eax        \n"
+            "movl	%%eax, %s(%%rip)    \n",
+            var1,
+            var2,
+            var3
+        );
+    }
+    fprintf(file, "\n");
     free(var1);
     free(var2);
     free(var3);
@@ -90,17 +104,31 @@ void generateSubAssembly(ThreeAddressCode* code, FILE* file){
     var1 = getLabelName(code->operator1->name, code->operator1->dataType);
     var2 = getLabelName(code->operator2->name, code->operator2->dataType);
     var3 = getLabelName(code->result->name, code->result->dataType);
-    fprintf(file, 
-        "#subtract                  \n"
-        "movl	%s(%%rip), %%eax    \n"
-        "movl 	%s(%%rip), %%edx    \n"
-        "subl 	%%edx, %%eax        \n"
-        "movl	%%eax, %s(%%rip)    \n"
-        "                           \n",
-        var1,
-        var2,
-        var3
-    );
+    DataType type = code->operator1->dataType;
+    fprintf(file, "#subtract\n");
+    if(type == DataTypeFloat){
+        fprintf(file,
+            "movss	%s(%%rip), %%xmm0   \n"
+            "movss 	%s(%%rip), %%xmm1   \n"
+            "subss 	%%xmm1, %%xmm0      \n"
+            "movss 	%%xmm0, %s(%%rip)   \n",
+            var1,
+            var2,
+            var3
+        );
+    }
+    else {
+        fprintf(file, 
+            "movl	%s(%%rip), %%eax    \n"
+            "movl 	%s(%%rip), %%edx    \n"
+            "subl 	%%edx, %%eax        \n"
+            "movl	%%eax, %s(%%rip)    \n",
+            var1,
+            var2,
+            var3
+        );
+    }
+    fprintf(file, "\n");
     free(var1);
     free(var2);
     free(var3);
@@ -111,17 +139,31 @@ void generateProdAssembly(ThreeAddressCode* code, FILE* file){
     var1 = getLabelName(code->operator1->name, code->operator1->dataType);
     var2 = getLabelName(code->operator2->name, code->operator2->dataType);
     var3 = getLabelName(code->result->name, code->result->dataType);
-    fprintf(file, 
-        "#multiplication            \n"
-        "movl	%s(%%rip), %%eax    \n"
-        "movl 	%s(%%rip), %%edx    \n"
-        "imull 	%%edx, %%eax        \n"
-        "movl	%%eax, %s(%%rip)    \n"
-        "                           \n",
-        var1,
-        var2,
-        var3
-    );
+    DataType type = code->operator1->dataType;
+    fprintf(file, "#multiplication\n");
+    if(type == DataTypeFloat){
+        fprintf(file,
+            "movss	%s(%%rip), %%xmm0   \n"
+            "movss 	%s(%%rip), %%xmm1   \n"
+            "mulss 	%%xmm1, %%xmm0      \n"
+            "movss 	%%xmm0, %s(%%rip)   \n",
+            var1,
+            var2,
+            var3
+        );
+    }
+    else {
+        fprintf(file, 
+            "movl	%s(%%rip), %%eax    \n"
+            "movl 	%s(%%rip), %%edx    \n"
+            "imull 	%%edx, %%eax        \n"
+            "movl	%%eax, %s(%%rip)    \n",
+            var1,
+            var2,
+            var3
+        );
+    }
+    fprintf(file, "\n");
     free(var1);
     free(var2);
     free(var3);
@@ -132,18 +174,32 @@ void generateDivAssembly(ThreeAddressCode* code, FILE* file){
     var1 = getLabelName(code->operator1->name, code->operator1->dataType);
     var2 = getLabelName(code->operator2->name, code->operator2->dataType);
     var3 = getLabelName(code->result->name, code->result->dataType);
-    fprintf(file, 
-        "#division                  \n"
-        "movl	%s(%%rip), %%eax    \n"
-        "movl 	%s(%%rip), %%ecx    \n"
-        "cltd                       \n"
-        "idivl 	%%ecx               \n"
-        "movl	%%eax, %s(%%rip)    \n"
-        "                           \n",
-        var1,
-        var2,
-        var3
-    );
+    DataType type = code->operator1->dataType;
+    fprintf(file, "#division\n");
+    if(type == DataTypeFloat){
+        fprintf(file,
+            "movss	%s(%%rip), %%xmm0   \n"
+            "movss 	%s(%%rip), %%xmm1   \n"
+            "divss 	%%xmm1, %%xmm0      \n"
+            "movss 	%%xmm0, %s(%%rip)   \n",
+            var1,
+            var2,
+            var3
+        );
+    }
+    else {
+        fprintf(file, 
+            "movl	%s(%%rip), %%eax    \n"
+            "movl 	%s(%%rip), %%ecx    \n"
+            "cltd                       \n"
+            "idivl 	%%ecx               \n"
+            "movl	%%eax, %s(%%rip)    \n",
+            var1,
+            var2,
+            var3
+        );
+    }
+    fprintf(file, "\n");
     free(var1);
     free(var2);
     free(var3);
