@@ -257,7 +257,7 @@ ThreeAddressCode* generateWhile(ThreeAddressCode* c1, ThreeAddressCode* c2, Symb
     ifLabel = insertLabel(table);
 
     loopLabelCode = createCode(TACLabel, NULL, NULL, loopLabel);
-    loopLabelCode->previous = c1;
+    c1->previous  = loopLabelCode;
 
     ifJumpCode = createCode(TACJumpF, c1?c1->result:NULL, NULL, ifLabel);
 
@@ -266,7 +266,7 @@ ThreeAddressCode* generateWhile(ThreeAddressCode* c1, ThreeAddressCode* c2, Symb
     
     ifLabelCode = createCode(TACLabel, NULL, NULL, ifLabel);
 
-    return joinCodes(joinCodes(loopLabelCode, ifJumpCode), joinCodes(loopJumpCode, ifLabelCode));
+    return joinCodes(joinCodes(c1, ifJumpCode), joinCodes(loopJumpCode, ifLabelCode));
 }
 
 ThreeAddressCode* generateFunctionCode(Symbol* symbol, ThreeAddressCode* c1) {

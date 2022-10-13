@@ -1,0 +1,12 @@
+float iterator(3,0);
+int main() {
+    while(iterator > 0,0){
+        if(iterator > 1,0){
+            print iterator " é maior que um!\n";
+        }
+        else {
+            print iterator " é menor ou igual a um!\n";
+        };
+        iterator <- iterator-1,0;
+    }
+}

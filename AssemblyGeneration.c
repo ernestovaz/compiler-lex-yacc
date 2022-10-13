@@ -360,12 +360,22 @@ void generateLabelAssembly(ThreeAddressCode* code, FILE* file){
     char *var1;
     var1 = getLabelName(code->result->name, code->result->dataType);
     fprintf(file,
-        "#if label         \n"
         "%s:               \n"
         "                  \n",
         var1
     );
     free(var1);
+}
+
+void generateJumpAssembly(ThreeAddressCode* code, FILE* file){
+    char *var1;
+    var1 = getLabelName(code->result->name, code->result->dataType);
+    fprintf(file, 
+    "jmp %s\n\n",
+        var1
+    );
+    free(var1);
+    
 }
 
 void generateArrayAccessAssembly(ThreeAddressCode* code, FILE* file){
@@ -493,6 +503,9 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
                 break;
             case TACAccess:
                 generateArrayAccessAssembly(ptr, file);
+                break;
+            case TACJump:
+                generateJumpAssembly(ptr, file);
                 break;
             default:
         }
