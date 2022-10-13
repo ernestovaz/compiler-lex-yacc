@@ -56,6 +56,7 @@ char* getSymbolTypeName(SymbolType type) {
         case SymbolStringLiteral:
             return "Literal(string)";
         default:
+	    break;
     }
     return "ERROR";
 }

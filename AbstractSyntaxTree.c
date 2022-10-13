@@ -85,6 +85,7 @@ char* _nodeTypeName(SyntaxNodeType type) {
         case ParameterListNode:
             return "PARAMETER LIST ELEMENT";
         default:
+	    break;
     }
     return "ERROR";
 }

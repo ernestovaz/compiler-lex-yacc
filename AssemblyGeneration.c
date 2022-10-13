@@ -45,6 +45,7 @@ const char* stringForData(DataType type){
         case DataTypeString:
             return "text_string";
         default:
+	    break;
     }
     return "";
 }
@@ -652,6 +653,7 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
                 generateJumpAssembly(ptr, file);
                 break;
             default:
+		break;
         }
     }
     
@@ -669,6 +671,7 @@ void generateSymbolTableAssembly(SymbolTable* table, FILE* file){
             SymbolType symbolType = node->symbol->type;
             DataType dataType = node->symbol->dataType;
 
+
             if(symbolType != SymbolLabel && symbolType != SymbolFunction){
                 if(symbolType == SymbolArray){
                     char *name, *type; 
@@ -682,16 +685,18 @@ void generateSymbolTableAssembly(SymbolTable* table, FILE* file){
                     else strcpy(type, "long");
 
                     fprintf(file, "_%s:\n", name);
-                    for(int i=0; i<node->symbol->arraySize; i++){
-                        Symbol* literal = node->symbol->arrayValues[i];
-                        char* value;
-                        value = (char*) malloc(strlen(literal->name)+1);
-                        strcpy(value, literal->name); 
-                        if(dataType == DataTypeFloat) 
-                            replaceDecimalSeparator(value, '.');
-                            
-                        fprintf(file, "    .%s %s\n", type, value);
-                    }
+		    if(node->symbol->arrayValues){
+			    for(int i=0; i<node->symbol->arraySize; i++){
+				Symbol* literal = node->symbol->arrayValues[i];
+				char* value;
+				value = (char*) malloc(strlen(literal->name)+1);
+				strcpy(value, literal->name); 
+				if(dataType == DataTypeFloat) 
+				    replaceDecimalSeparator(value, '.');
+				    
+				fprintf(file, "    .%s %s\n", type, value);
+			    }
+		    }
                 } 
                 else {
                     char *name, *value, *type; 

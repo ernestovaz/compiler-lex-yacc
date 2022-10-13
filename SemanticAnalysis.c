@@ -109,6 +109,7 @@ void analyzeCommand(SyntaxTreeNode* node, DataType returnType) {
                 }
             }
             default:
+		break;
         }
     }
 }
@@ -271,6 +272,7 @@ DataType getExpressionDataType(SyntaxTreeNode* expressionNode) {
             return symbol->dataType;
             
         default:
+	    break;
     }
     return 0; 
 }
@@ -283,7 +285,8 @@ DataType dataTypeFromTypeNode(SyntaxTreeNode* node) {
             return DataTypeFloat;
         case CharTypeNode:
             return DataTypeChar;
-        default:
+       default:
+	    break;
             return None;
     }
 }
@@ -456,6 +459,7 @@ void checkSymbolDeclaration(SyntaxTreeNode* node) {
             break;
         }
         default:
+	    break;
     }
     symbol->type = symbolType;
     
