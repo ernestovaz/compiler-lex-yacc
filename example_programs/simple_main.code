@@ -1,5 +1,6 @@
-int mauro(5);
 int jonas(7);
 int main() {
-    print jonas.mauro "\n";
+    print jonas;
+    read jonas;
+    print jonas;
 }
