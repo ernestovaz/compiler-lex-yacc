@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-ThreeAddressCode* generateBinaryOperationCode(ThreeAddressCodeType type, ThreeAddressCode* op1, ThreeAddressCode* op2, SymbolTable* table);
+ThreeAddressCode* generateBinaryOperationCode(ThreeAddressCodeType type, DataType dataType, ThreeAddressCode* op1, ThreeAddressCode* op2, SymbolTable* table);
 ThreeAddressCode* generateUnaryOperationCode(ThreeAddressCodeType type, ThreeAddressCode* op, SymbolTable* table);
 ThreeAddressCode* generateAccessCode(Symbol* symbol, ThreeAddressCode* index, SymbolTable* table);
 ThreeAddressCode* generateFunctionCode(Symbol* symbol, ThreeAddressCode* c1);
@@ -109,40 +109,40 @@ ThreeAddressCode* generateCode(SyntaxTreeNode* node, SymbolTable* table){
             
             // Operators
             case AddNode:
-                result = generateBinaryOperationCode(TACAdd, subtrees[0], subtrees[1], table);
+                result = generateBinaryOperationCode(TACAdd, subtrees[0]->result->dataType, subtrees[0], subtrees[1], table);
                 break;
             case SubNode:
-                result = generateBinaryOperationCode(TACSub, subtrees[0], subtrees[1], table);
+                result = generateBinaryOperationCode(TACSub, subtrees[0]->result->dataType, subtrees[0], subtrees[1], table);
                 break;
             case ProdNode:
-                result = generateBinaryOperationCode(TACMul, subtrees[0], subtrees[1], table);
+                result = generateBinaryOperationCode(TACMul, subtrees[0]->result->dataType, subtrees[0], subtrees[1], table);
                 break;
             case DivNode:
-                result = generateBinaryOperationCode(TACDiv, subtrees[0], subtrees[1], table);
+                result = generateBinaryOperationCode(TACDiv, subtrees[0]->result->dataType, subtrees[0], subtrees[1], table);
                 break;
             case LessNode:
-                result = generateBinaryOperationCode(TACLess, subtrees[0], subtrees[1], table);
+                result = generateBinaryOperationCode(TACLess, DataTypeBool, subtrees[0], subtrees[1], table);
                 break;
             case GreaterNode:
-                result = generateBinaryOperationCode(TACGreater, subtrees[0], subtrees[1], table);
+                result = generateBinaryOperationCode(TACGreater, DataTypeBool, subtrees[0], subtrees[1], table);
                 break;
             case AndNode:
-                result = generateBinaryOperationCode(TACAnd, subtrees[0], subtrees[1], table);
+                result = generateBinaryOperationCode(TACAnd, DataTypeBool, subtrees[0], subtrees[1], table);
                 break;
             case OrNode:
-                result = generateBinaryOperationCode(TACOr, subtrees[0], subtrees[1], table);
+                result = generateBinaryOperationCode(TACOr, DataTypeBool, subtrees[0], subtrees[1], table);
                 break;
             case LessEqualNode:
-                result = generateBinaryOperationCode(TACLeq, subtrees[0], subtrees[1], table);
+                result = generateBinaryOperationCode(TACLeq, DataTypeBool, subtrees[0], subtrees[1], table);
                 break;
             case GreaterEqualNode:
-                result = generateBinaryOperationCode(TACGeq, subtrees[0], subtrees[1], table);
+                result = generateBinaryOperationCode(TACGeq, DataTypeBool, subtrees[0], subtrees[1], table);
                 break;
             case EqualNode:
-                result = generateBinaryOperationCode(TACEq, subtrees[0], subtrees[1], table);
+                result = generateBinaryOperationCode(TACEq, DataTypeBool, subtrees[0], subtrees[1], table);
                 break;
             case DifferentNode:
-                result = generateBinaryOperationCode(TACDif, subtrees[0], subtrees[1], table);
+                result = generateBinaryOperationCode(TACDif, DataTypeBool, subtrees[0], subtrees[1], table);
                 break;
             case NegationNode:
                 result = generateUnaryOperationCode(TACNeg, subtrees[0], table);
@@ -158,14 +158,14 @@ ThreeAddressCode* generateCode(SyntaxTreeNode* node, SymbolTable* table){
     return result;
 }
 
-ThreeAddressCode* generateBinaryOperationCode(ThreeAddressCodeType type, ThreeAddressCode* op1, ThreeAddressCode* op2, SymbolTable* table) {
+ThreeAddressCode* generateBinaryOperationCode(ThreeAddressCodeType type, DataType dataType, ThreeAddressCode* op1, ThreeAddressCode* op2, SymbolTable* table) {
     return joinCodes(
         joinCodes(op1, op2), 
         createCode(
             type, 
             op1?op1->result:NULL, 
             op2?op2->result:NULL, 
-            insertTemporary(table, op1->result->dataType)
+            insertTemporary(table, dataType)
         )
     );
 }

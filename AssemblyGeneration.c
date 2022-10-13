@@ -35,6 +35,7 @@ char* getLabelName(char* name, DataType type){
 
 const char* stringForData(DataType type){
     switch(type){
+        case DataTypeBool:
         case DataTypeInt:
             return "int_string";
         case DataTypeFloat:
@@ -210,18 +211,7 @@ void generatePrintAssembly(char* label, DataType type, FILE* file){
     if(type == DataTypeString) data = label;
     else data = stringForData(type);
 
-    if(type != DataTypeFloat){
-        fprintf(file, 
-            "#print                     \n"
-            "leaq	%s(%%rip), %%rax    \n"
-            "movl	%s(%%rip), %%esi    \n"
-            "movq	%%rax, %%rdi        \n"
-            "call	printf@PLT          \n"
-            "                           \n",
-            data,
-            label
-        );
-    } else {
+    if(type == DataTypeFloat){
         fprintf(file, 
             "#load floating point               \n"
             "movss	%s(%%rip), %%xmm0           \n"
@@ -236,6 +226,17 @@ void generatePrintAssembly(char* label, DataType type, FILE* file){
             "                                   \n",
             label,
             data
+        );
+    } else {
+        fprintf(file, 
+            "#print                     \n"
+            "leaq	%s(%%rip), %%rax    \n"
+            "movl	%s(%%rip), %%esi    \n"
+            "movq	%%rax, %%rdi        \n"
+            "call	printf@PLT          \n"
+            "                           \n",
+            data,
+            label
         );
     }
 }
@@ -298,20 +299,37 @@ void generateGreaterAssembly(ThreeAddressCode* code, FILE* file) {
     var1 = getLabelName(code->operator1->name, code->operator1->dataType);
     var2 = getLabelName(code->operator2->name, code->operator2->dataType);
     var3 = getLabelName(code->result->name, code->result->dataType);
+    DataType type = code->operator1->dataType;
     fprintf(file,
         "#greater than       \n"
-        "movl $0, %s(%%rip)  \n"
-        "movl %s(%%rip), %%eax\n"
-        "movl %s(%%rip), %%edx\n"
-        "cmpl %%eax, %%edx  \n"
-        "jle .L%d            \n"
+        "movl $0, %s(%%rip)  \n", 
+        var3
+    );
+    if(type == DataTypeFloat){
+        fprintf(file,
+            "movss %s(%%rip), %%xmm0\n"
+            "movss %s(%%rip), %%xmm1\n"
+            "comiss %%xmm0, %%xmm1  \n"
+            "jbe .L%d             \n",
+            var2,
+            var1,
+            g_labelCount
+        );
+    } else {
+        fprintf(file,
+            "movl %s(%%rip), %%eax\n"
+            "movl %s(%%rip), %%edx\n"
+            "cmpl %%eax, %%edx    \n"
+            "jle .L%d             \n",
+            var2,
+            var1,
+            g_labelCount
+        );
+    }
+    fprintf(file,
         "movl $1, %s(%%rip)  \n"
         ".L%d:               \n"  
         "                    \n",
-        var3,
-        var2,
-        var1,
-        g_labelCount,
         var3,
         g_labelCount
     );
