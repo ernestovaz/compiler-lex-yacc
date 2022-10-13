@@ -16,6 +16,8 @@ char* _nodeTypeName(SyntaxNodeType type) {
             return "SUB";
         case ProdNode:
             return "PROD";
+        case DivNode:
+            return "DIVISION";
         case NegationNode:
             return "NEGATION";
         case LessNode:
@@ -82,6 +84,7 @@ char* _nodeTypeName(SyntaxNodeType type) {
             return "FUNCTION DEFINITION";
         case ParameterListNode:
             return "PARAMETER LIST ELEMENT";
+        default:
     }
     return "ERROR";
 }

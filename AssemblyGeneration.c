@@ -15,7 +15,8 @@ void replaceDecimalSeparator(char* number, char separator){
 
 void reformatString(char* string){
     for(int i=0; i<strlen(string); i++){
-        if(string[i] == '"' || string[i] == '\\' || string[i] == ' ' || string[i] == '!') string[i] = '_';
+        if(string[i] == '"' || string[i] == '\\' || string[i] == ' ' || string[i] == '!' || string[i] == ':' || string[i] == '=') 
+            string[i] = '_';
     }
 }
 
@@ -42,6 +43,7 @@ const char* stringForData(DataType type){
             return "char_string";
         case DataTypeString:
             return "text_string";
+        default:
     }
     return "";
 }
@@ -382,6 +384,7 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
             case TACLabel:
                 generateLabelAssembly(ptr, file);
                 break;
+            default:
         }
     }
     

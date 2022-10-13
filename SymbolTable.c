@@ -39,6 +39,8 @@ Symbol* handleCollision(SymbolTableNode* position, SymbolTableNode* node){
         }
         position = position->next;
     }
+
+    return NULL;
 }
 
 char* getSymbolTypeName(SymbolType type) {
@@ -53,6 +55,7 @@ char* getSymbolTypeName(SymbolType type) {
             return "Literal(float)";
         case SymbolStringLiteral:
             return "Literal(string)";
+        default:
     }
     return "ERROR";
 }
@@ -146,7 +149,7 @@ void printSymbolTable(SymbolTable* table){
         node = table->table[i];
         if (node != NULL) {
             do {
-                printf("[%011d] ", node->key);
+                printf("[%s] ", node->key);
                 printSymbol(*(node->symbol));
                 printf("\n");
                 node = node->next;

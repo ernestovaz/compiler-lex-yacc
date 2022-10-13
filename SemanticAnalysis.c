@@ -99,6 +99,7 @@ void analyzeCommand(SyntaxTreeNode* node, DataType returnType) {
                 analyzeCommand(node->children[1], returnType);
                 break;
             }
+            default:
         }
     }
 }
@@ -261,6 +262,8 @@ DataType getExpressionDataType(SyntaxTreeNode* expressionNode) {
             return symbol->dataType;
             
         }
+
+        default:
     }
     return 0; //for now accepts by default, ideally shouldn't
 }
@@ -273,6 +276,8 @@ DataType dataTypeFromTypeNode(SyntaxTreeNode* node) {
             return DataTypeFloat;
         case CharTypeNode:
             return DataTypeChar;
+        default:
+            return None;
     }
 }
 
@@ -285,6 +290,10 @@ DataType dataTypeFromLiteralNode(SyntaxTreeNode* node) {
             return DataTypeFloat;
         case SymbolStringLiteral:
             return DataTypeString;
+        case SymbolCharLiteral:
+            return DataTypeChar;
+        default:
+            return None;
     }
 }
 
@@ -412,7 +421,6 @@ void checkSymbolDeclaration(SyntaxTreeNode* node) {
         case ArrayDefNode: {
             symbolType = SymbolArray;
             SyntaxTreeNode* arraySizeNode = node->children[1];
-            DataType sizeLiteralType = dataTypeFromLiteralNode(arraySizeNode);
             int declaredSize = atoi(arraySizeNode->symbol->name);
             if(declaredSize <= 0) {
                 fprintf(stderr, "error: Non positive integer size specified for array: %s\n", symbol->name);
@@ -429,6 +437,7 @@ void checkSymbolDeclaration(SyntaxTreeNode* node) {
             addPrefix(symbol);
             break;
         }
+        default:
     }
     symbol->type = symbolType;
     

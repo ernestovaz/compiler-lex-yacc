@@ -1,5 +1,5 @@
 etapa6: y.tab.c lex.yy.c
-	gcc -o etapa6 lex.yy.c main.c SymbolTable.c AbstractSyntaxTree.c Decompilation.c SemanticAnalysis.c IntermediaryCode.c AssemblyGeneration.c
+	gcc -Wall -o etapa6 lex.yy.c main.c SymbolTable.c AbstractSyntaxTree.c Decompilation.c SemanticAnalysis.c IntermediaryCode.c AssemblyGeneration.c
 
 y.tab.c: parser.y
 	yacc -d parser.y
@@ -20,6 +20,6 @@ test: etapa6
 	do\
 		echo;\
 		echo "TEST: $$test_file";\
-		./etapa5 $$test_file || true;\
+		./etapa6 $$test_file || true;\
 	done
 

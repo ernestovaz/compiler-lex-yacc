@@ -30,6 +30,7 @@ void decompileDefinition(SyntaxTreeNode* node, FILE* file) {
         case ArrayDefNode:
             decompileArrayDef(node, file);
             break;
+        default:
     }
 }
 
@@ -87,6 +88,7 @@ void decompileExpression(SyntaxTreeNode* node, FILE* file) {
         case FunctionNode:
             decompileFunction(node, file);
             break;
+        default:
     }
 }
 
@@ -212,6 +214,7 @@ void decompileType(SyntaxTreeNode* node, FILE* file) {
         case CharTypeNode:
             fprintf(file, "char");
             break;
+        default:
     }
 }
 
@@ -260,6 +263,7 @@ void decompileRead(SyntaxTreeNode* node, FILE* file) {
         case ArrayNode:
             decompileArray(node->children[0], file);
             break;
+        default:
     }
 }
 
@@ -334,6 +338,7 @@ void decompileCommand(SyntaxTreeNode* node, FILE* file) {
             case WhileNode:
                 decompileWhile(node, file);
                 break;
+            default:
         }
     }
 }

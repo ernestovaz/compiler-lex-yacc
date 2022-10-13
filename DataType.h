@@ -8,5 +8,6 @@ typedef enum data_type{
     DataTypeFloat,
     DataTypeChar,
     DataTypeString,
-    DataTypeBool
+    DataTypeBool,
+    None
 }DataType;
