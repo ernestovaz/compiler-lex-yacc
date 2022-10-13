@@ -1,11 +1,4 @@
-float six(6,0);
-float two(2,0);
-float number(0,0);
-
+int array[5] 2 5 9 8 7;
 int main() {
-    print scooby_doo()/two;
-}
-
-float scooby_doo(){
-    return 8,00;
+    print array[0];
 }

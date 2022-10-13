@@ -328,15 +328,24 @@ void checkSymbolUndeclared(Symbol* symbol) {
     } 
 }
 
-int isArrayListIncompatible(int expectedSize, DataType expectedType, SyntaxTreeNode* literalList) {
+int isArrayListIncompatible(Symbol* array, SyntaxTreeNode* literalList) {
     int actualSize = 0;
+    Symbol** values;
+    values = malloc(array->arraySize * sizeof(Symbol*));
     while(literalList != NULL) {
+        Symbol* literal = literalList->children[0]->symbol;
+        values[actualSize] = literal;
+
         DataType literalType = dataTypeFromLiteralNode(literalList->children[0]);
-        if(areTypesIncompatible(expectedType, literalType)) return 1;
+        if(areTypesIncompatible(array->dataType, literalType)) return 1;
         literalList = literalList->children[1];
         actualSize++;
     }
-    if(actualSize != expectedSize) return 1;
+    array->arrayValues = values;
+    if(actualSize != array->arraySize){
+        array->arraySize = actualSize;
+        return 1;  
+    } 
     else return 0;
 }
 
@@ -436,13 +445,13 @@ void checkSymbolDeclaration(SyntaxTreeNode* node) {
                 errorCount++;
             }
             SyntaxTreeNode* elementList = node->children[2];
+            symbol->arraySize = declaredSize;
             if(elementList != NULL) {
-                if(isArrayListIncompatible(declaredSize, declaredType, elementList)) {
+                if(isArrayListIncompatible(symbol, elementList)) {
                     fprintf(stderr, "error: Incompatible list for array: %s\n", symbol->name);
                     errorCount++;
                 }
             }
-            symbol->arraySize = declaredSize;
             addPrefix(symbol);
             break;
         }

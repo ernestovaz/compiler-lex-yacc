@@ -23,9 +23,12 @@ typedef struct symbol{
     char* name;
     SymbolType type;
     DataType dataType;
-    struct symbol** arguments;
-    int arraySize;
-    int argumentCount;
-
     struct symbol* initialValue;
+
+    int argumentCount;
+    struct symbol** arguments;
+
+    int arraySize;
+    struct symbol** arrayValues;
+
 } Symbol;

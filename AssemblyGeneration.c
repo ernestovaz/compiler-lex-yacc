@@ -350,6 +350,29 @@ void generateLabelAssembly(ThreeAddressCode* code, FILE* file){
     free(var1);
 }
 
+void generateArrayAccessAssembly(ThreeAddressCode* code, FILE* file){
+    char *var1, *var2, *var3;
+    var1 = getLabelName(code->operator1->name, code->operator1->dataType);
+    var2 = getLabelName(code->operator2->name, code->operator2->dataType);
+    var3 = getLabelName(code->result->name, code->result->dataType);
+    fprintf(file, "#array access\n");
+    fprintf(file,
+        "movl	%s(%%rip), %%eax       \n"
+        "cltq                          \n"
+        "leaq	0(,%%rax,4), %%rdx     \n"
+        "leaq	%s(%%rip), %%rax       \n"
+        "movl	(%%rdx,%%rax), %%eax   \n"
+        "movl	%%eax, %s(%%rip)       \n",
+        var2,
+        var1,
+        var3
+    );
+    fprintf(file, "\n");
+    free(var1);
+    free(var2);
+    free(var3);
+}
+
 void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
     FILE* file;
     file = fopen("out.s", "w");
@@ -439,6 +462,9 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
             case TACLabel:
                 generateLabelAssembly(ptr, file);
                 break;
+            case TACAccess:
+                generateArrayAccessAssembly(ptr, file);
+                break;
             default:
         }
     }
@@ -457,51 +483,75 @@ void generateSymbolTableAssembly(SymbolTable* table, FILE* file){
             SymbolType symbolType = node->symbol->type;
             DataType dataType = node->symbol->dataType;
 
-            //only variables and literals for now
-            if(symbolType != SymbolFunction && symbolType != SymbolArray && symbolType != SymbolLabel){
-                char *name, *value, *type; 
-                name    = (char*) malloc(strlen(node->symbol->name)+1);
-                type    = (char*) malloc(7);
+            if(symbolType != SymbolLabel && symbolType != SymbolFunction){
+                if(symbolType == SymbolArray){
+                    char *name, *type; 
+                    name    = (char*) malloc(strlen(node->symbol->name)+1);
+                    type    = (char*) malloc(7);
 
-                //name
-                strcpy(name, node->symbol->name);
-                
-                //value
-                if(symbolType == SymbolVariable){
-                    if(node->symbol->initialValue){
-                        char* initialValue = node->symbol->initialValue->name;
-                        value   = (char*) malloc(strlen(initialValue)+1);
-                        value = strcpy(value, initialValue);  
-                    } else {
-                        value   = (char*) malloc(2);
-                        value = strcpy(value, "0");
+                    //name
+                    strcpy(name, node->symbol->name);
+                    //type
+                    if(dataType == DataTypeFloat) strcpy(type, "float");
+                    else strcpy(type, "long");
+
+                    fprintf(file, "_%s:\n", name);
+                    for(int i=0; i<node->symbol->arraySize; i++){
+                        Symbol* literal = node->symbol->arrayValues[i];
+                        char* value;
+                        value = (char*) malloc(strlen(literal->name)+1);
+                        strcpy(value, literal->name); 
+                        if(dataType == DataTypeFloat) 
+                            replaceDecimalSeparator(value, '.');
+                            
+                        fprintf(file, "    .%s %s\n", type, value);
                     }
-                } else { //else is literal
-                    value   = (char*) malloc(strlen(name)+1);
-                    strcpy(value, name); 
                 } 
-                if(dataType == DataTypeFloat){
-                    replaceDecimalSeparator(name, '_');
-                    replaceDecimalSeparator(value, '.');
-                    strcpy(type, "float");
-                }
-                else if(dataType == DataTypeString){
-                    reformatString(name);
-                    strcpy(type, "string");
-                } else{
-                    strcpy(type, "long");
-                }
+                else {
+                    char *name, *value, *type; 
+                    name    = (char*) malloc(strlen(node->symbol->name)+1);
+                    type    = (char*) malloc(7);
 
-                fprintf(file,
-                    "_%s:   .%s   %s\n",
-                    name,
-                    type,
-                    value
-                );
+                    //name
+                    strcpy(name, node->symbol->name);
+                    
+                    //value
+                    if(symbolType == SymbolVariable){
+                        if(node->symbol->initialValue){
+                            char* initialValue = node->symbol->initialValue->name;
+                            value   = (char*) malloc(strlen(initialValue)+1);
+                            value = strcpy(value, initialValue);  
+                        } else {
+                            value   = (char*) malloc(2);
+                            value = strcpy(value, "0");
+                        }
+                    } else { //else is literal
+                        value   = (char*) malloc(strlen(name)+1);
+                        strcpy(value, name); 
+                    } 
+                    if(dataType == DataTypeFloat){
+                        replaceDecimalSeparator(name, '_');
+                        replaceDecimalSeparator(value, '.');
+                        strcpy(type, "float");
+                    }
+                    else if(dataType == DataTypeString){
+                        reformatString(name);
+                        strcpy(type, "string");
+                    } else{
+                        strcpy(type, "long");
+                    }
 
-                free(name);
-                free(value);
-                free(type);
+                    fprintf(file,
+                        "_%s:   .%s   %s\n",
+                        name,
+                        type,
+                        value
+                    );
+
+                    free(name);
+                    free(value);
+                    free(type);
+                }
             }
         }
     }
