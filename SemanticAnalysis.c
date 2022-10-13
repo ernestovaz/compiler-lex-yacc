@@ -286,8 +286,8 @@ DataType dataTypeFromTypeNode(SyntaxTreeNode* node) {
         case CharTypeNode:
             return DataTypeChar;
        default:
-	    break;
             return None;
+	        break;
     }
 }
 
@@ -459,7 +459,8 @@ void checkSymbolDeclaration(SyntaxTreeNode* node) {
             break;
         }
         default:
-	    break;
+            symbolType = SymbolFunction;
+	        break;
     }
     symbol->type = symbolType;
     

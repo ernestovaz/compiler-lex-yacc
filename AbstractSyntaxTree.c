@@ -107,9 +107,9 @@ void printAST(SyntaxTreeNode* node, int level) {
     if(node != NULL) {
         for(int i=0; i<level; i++) fprintf(stderr," ");
         if(level>0) fprintf(stderr, "|_");
-        fprintf(stderr, _nodeTypeName(node->type));
+        //fprintf(stderr, _nodeTypeName(node->type));
         fprintf(stderr, " ");
-        if(node->symbol != NULL) fprintf(stderr, "%s", node->symbol->name);
+        //if(node->symbol != NULL) fprintf(stderr, "%s", node->symbol->name);
         fprintf(stderr, "\n");
         for(int i=0; i<4; i++){
             SyntaxTreeNode* child = node->children[i];

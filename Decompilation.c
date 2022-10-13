@@ -112,7 +112,7 @@ void decompileArray(SyntaxTreeNode* node, FILE* file) {
 }
 
 void decompileSymbol(SyntaxTreeNode* node, FILE* file) {
-    fprintf(file, node->symbol->name);
+    fprintf(file, "%s", node->symbol->name);
 }
 
 void decompileParentheses(SyntaxTreeNode* node, FILE* file) {
@@ -199,7 +199,7 @@ void decompileDifferent(SyntaxTreeNode* node, FILE* file) {
 }
 
 void decompileFunction(SyntaxTreeNode* node, FILE* file) {
-    fprintf(file, node->symbol->name);
+    fprintf(file, "%s", node->symbol->name);
     fprintf(file, "(");
     decompileExpressionList(node->children[0], file);
     fprintf(file, ")");
