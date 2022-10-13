@@ -355,18 +355,29 @@ void generateArrayAccessAssembly(ThreeAddressCode* code, FILE* file){
     var1 = getLabelName(code->operator1->name, code->operator1->dataType);
     var2 = getLabelName(code->operator2->name, code->operator2->dataType);
     var3 = getLabelName(code->result->name, code->result->dataType);
-    fprintf(file, "#array access\n");
+    DataType type = code->operator1->dataType;
     fprintf(file,
+        "#array access                 \n"
         "movl	%s(%%rip), %%eax       \n"
         "cltq                          \n"
         "leaq	0(,%%rax,4), %%rdx     \n"
-        "leaq	%s(%%rip), %%rax       \n"
-        "movl	(%%rdx,%%rax), %%eax   \n"
-        "movl	%%eax, %s(%%rip)       \n",
-        var2,
-        var1,
-        var3
+        "leaq	%s(%%rip), %%rax       \n",
+        var2, 
+        var1
     );
+    if(type == DataTypeFloat) {
+        fprintf(file,
+            "movss	(%%rdx,%%rax), %%xmm0   \n"
+            "movss	%%xmm0, %s(%%rip)       \n",
+            var3
+        );
+    } else {
+        fprintf(file,
+            "movl	(%%rdx,%%rax), %%eax   \n"
+            "movl	%%eax, %s(%%rip)       \n",
+            var3
+        );
+    }
     fprintf(file, "\n");
     free(var1);
     free(var2);
