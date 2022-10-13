@@ -263,6 +263,35 @@ void generateGreaterAssembly(ThreeAddressCode* code, FILE* file) {
     free(var3);
 }
 
+void genereateIfAssembly(ThreeAddressCode* code, FILE* file){
+    char *var1, *var2;
+    var1 = getLabelName(code->operator1->name, code->operator1->dataType);
+    var2 = getLabelName(code->result->name, code->result->dataType);
+    fprintf(file,
+        "#if                    \n"
+        "movl %s(%%rip), %%eax  \n"
+        "testl %%eax, %%eax     \n"
+        "je %s                  \n"
+        "                       \n",
+        var1,
+        var2
+    );
+    free(var1);
+    free(var2);
+}
+
+void generateLabelAssembly(ThreeAddressCode* code, FILE* file){
+    char *var1;
+    var1 = getLabelName(code->result->name, code->result->dataType);
+    fprintf(file,
+        "#if label         \n"
+        "%s:               \n"
+        "                  \n",
+        var1
+    );
+    free(var1);
+}
+
 void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
     FILE* file;
     file = fopen("out.s", "w");
@@ -347,6 +376,12 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
             case TACGreater:
                 generateGreaterAssembly(ptr, file);
                 break;
+            case TACJumpF:
+                genereateIfAssembly(ptr, file);
+                break;
+            case TACLabel:
+                generateLabelAssembly(ptr, file);
+                break;
         }
     }
     
@@ -365,7 +400,7 @@ void generateSymbolTableAssembly(SymbolTable* table, FILE* file){
             DataType dataType = node->symbol->dataType;
 
             //only variables and literals for now
-            if(symbolType != SymbolFunction && symbolType != SymbolArray){
+            if(symbolType != SymbolFunction && symbolType != SymbolArray && symbolType != SymbolLabel){
                 char *name, *value, *type; 
                 name    = (char*) malloc(strlen(node->symbol->name)+1);
                 type    = (char*) malloc(7);

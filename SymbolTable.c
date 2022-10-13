@@ -106,7 +106,7 @@ Symbol* insertLabel(SymbolTable* table) {
     static int id = 0;
     char name[256] = "";
     sprintf(name, "_label%d", id++);
-    return insertSymbol(table, name, SymbolVariable);
+    return insertSymbol(table, name, SymbolLabel);
 }
 
 Symbol* getSymbol(SymbolTable* table, char* name){

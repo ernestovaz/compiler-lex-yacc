@@ -14,7 +14,9 @@ typedef enum symbol_type{
     //assigned to identifiers at semantic analysis
     SymbolVariable,
     SymbolArray,
-    SymbolFunction
+    SymbolFunction,
+    //assigned in code generation
+    SymbolLabel
 }SymbolType;
 
 typedef struct symbol{

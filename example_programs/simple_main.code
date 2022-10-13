@@ -1,4 +1,11 @@
 int jonas(7);
 int main() {
-    print jonas>0;
+    jonas <- 0;
+    if(jonas>0){
+        print "caramba!";
+    };
+    jonas <- 1;
+    if(jonas>0){
+        print "not caramba!";
+    };
 }

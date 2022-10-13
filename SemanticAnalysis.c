@@ -398,7 +398,7 @@ void checkSymbolDeclaration(SyntaxTreeNode* node) {
             symbolType = SymbolFunction;
             checkFunctionDeclaration(node);
             break;
-        case VariableDefNode:
+        case VariableDefNode: {
             symbolType = SymbolVariable;
             DataType literalType = dataTypeFromLiteralNode(node->children[1]);
             if(areTypesIncompatible(declaredType, literalType)) {
@@ -408,7 +408,8 @@ void checkSymbolDeclaration(SyntaxTreeNode* node) {
             symbol->initialValue = node->children[1]->symbol;                
             addPrefix(symbol);
             break;
-        case ArrayDefNode:
+        }
+        case ArrayDefNode: {
             symbolType = SymbolArray;
             SyntaxTreeNode* arraySizeNode = node->children[1];
             DataType sizeLiteralType = dataTypeFromLiteralNode(arraySizeNode);
@@ -427,6 +428,7 @@ void checkSymbolDeclaration(SyntaxTreeNode* node) {
             symbol->arraySize = declaredSize;
             addPrefix(symbol);
             break;
+        }
     }
     symbol->type = symbolType;
     
