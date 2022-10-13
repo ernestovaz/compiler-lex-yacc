@@ -144,6 +144,8 @@ void generateDivAssembly(ThreeAddressCode* code, FILE* file){
     free(var3);
 }
 
+
+
 void generatePrintAssembly(char* label, DataType type, FILE* file){
     const char* data;
     if(type == DataTypeString) data = label;
@@ -177,6 +179,25 @@ void generatePrintAssembly(char* label, DataType type, FILE* file){
             data
         );
     }
+}
+
+void generateReadAssembly(char* label, DataType type, FILE* file){
+    const char* data;
+    if(type == DataTypeString) data = label;
+    else data = stringForData(type);
+
+    fprintf(file, 
+    "#read                      \n"
+    "leaq	%s(%%rip), %%rax    \n"
+    "movq	%%rax, %%rsi        \n"
+    "leaq	%s(%%rip), %%rax    \n"
+    "movq	%%rax, %%rdi        \n"
+    "call	__isoc99_scanf@PLT  \n"
+    "                           \n",
+    label,
+    data
+    );
+
 }
 
 void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
@@ -222,11 +243,12 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
                     "               \n"
                 );
                 break;
-            case TACPrint:
+            case TACPrint:{
                 DataType type = ptr->result->dataType;
                 char* label = getLabelName(ptr->result->name, type);
                 generatePrintAssembly(label, type, file);
                 free(label);
+            }
                 break;
             case TACAdd:
                 generateAddAssembly(ptr, file);
@@ -243,6 +265,12 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
             case TACDiv:
                 generateDivAssembly(ptr,file);
                 break;
+            case TACRead:{
+                DataType type = ptr->result->dataType;
+                char* label = getLabelName(ptr->result->name, type);
+                generateReadAssembly(label, type, file);
+                free(label);
+            }
         }
     }
     
