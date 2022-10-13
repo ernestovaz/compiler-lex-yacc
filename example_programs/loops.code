@@ -1,12 +1,12 @@
-float iterator(3,0);
+float iterator(0,0);
 int main() {
-    while(iterator > 0,0){
-        if(iterator > 1,0){
-            print iterator " é maior que um!\n";
+    while(iterator < 4,0){
+        if(iterator != 2,0){
+            print iterator " é diferente de 2!\n";
         }
         else {
-            print iterator " é menor ou igual a um!\n";
+            print iterator " é igual a 2!\n";
         };
-        iterator <- iterator-1,0;
+        iterator <- iterator+1,0;
     }
 }

@@ -384,6 +384,96 @@ void generateLessAssembly(ThreeAddressCode* code, FILE* file) {
     free(var3);
 }
 
+void generateEqualAssembly(ThreeAddressCode* code, FILE* file) {
+    char *var1, *var2, *var3;
+    var1 = getLabelName(code->operator1->name, code->operator1->dataType);
+    var2 = getLabelName(code->operator2->name, code->operator2->dataType);
+    var3 = getLabelName(code->result->name, code->result->dataType);
+    DataType type = code->operator1->dataType;
+    fprintf(file,
+        "#equal              \n"
+        "movl $0, %s(%%rip)  \n", 
+        var3
+    );
+    if(type == DataTypeFloat){
+        fprintf(file,
+            "movss %s(%%rip), %%xmm0\n"
+            "movss %s(%%rip), %%xmm1\n"
+            "comiss %%xmm0, %%xmm1  \n"
+            "jne .L%d             \n",
+            var2,
+            var1,
+            g_labelCount
+        );
+    } else {
+        fprintf(file,
+            "movl %s(%%rip), %%eax\n"
+            "movl %s(%%rip), %%edx\n"
+            "cmpl %%eax, %%edx    \n"
+            "jne .L%d             \n",
+            var2,
+            var1,
+            g_labelCount
+        );
+    }
+    fprintf(file,
+        "movl $1, %s(%%rip)  \n"
+        ".L%d:               \n"  
+        "                    \n",
+        var3,
+        g_labelCount
+    );
+    g_labelCount++;
+    free(var1);
+    free(var2);
+    free(var3);
+}
+
+void generateDifferentAssembly(ThreeAddressCode* code, FILE* file) {
+    char *var1, *var2, *var3;
+    var1 = getLabelName(code->operator1->name, code->operator1->dataType);
+    var2 = getLabelName(code->operator2->name, code->operator2->dataType);
+    var3 = getLabelName(code->result->name, code->result->dataType);
+    DataType type = code->operator1->dataType;
+    fprintf(file,
+        "#not equal          \n"
+        "movl $0, %s(%%rip)  \n", 
+        var3
+    );
+    if(type == DataTypeFloat){
+        fprintf(file,
+            "movss %s(%%rip), %%xmm0\n"
+            "movss %s(%%rip), %%xmm1\n"
+            "comiss %%xmm0, %%xmm1  \n"
+            "je .L%d             \n",
+            var2,
+            var1,
+            g_labelCount
+        );
+    } else {
+        fprintf(file,
+            "movl %s(%%rip), %%eax\n"
+            "movl %s(%%rip), %%edx\n"
+            "cmpl %%eax, %%edx    \n"
+            "je .L%d             \n",
+            var2,
+            var1,
+            g_labelCount
+        );
+    }
+    fprintf(file,
+        "movl $1, %s(%%rip)  \n"
+        ".L%d:               \n"  
+        "                    \n",
+        var3,
+        g_labelCount
+    );
+    g_labelCount++;
+    free(var1);
+    free(var2);
+    free(var3);
+}
+
 void genereateIfAssembly(ThreeAddressCode* code, FILE* file){
     char *var1, *var2;
     var1 = getLabelName(code->operator1->name, code->operator1->dataType);
@@ -542,6 +632,12 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
                 break;
             case TACLess:
                 generateLessAssembly(ptr, file);
+                break;
+            case TACEq:
+                generateEqualAssembly(ptr, file);
+                break;
+            case TACDif:
+                generateDifferentAssembly(ptr, file);
                 break;
             case TACJumpF:
                 genereateIfAssembly(ptr, file);
