@@ -3,6 +3,7 @@
 #include <string.h>
 
 int g_functionNumber = 1;
+int g_labelCount = 1;
 
 //Replace comma decimal separator with a dot
 void replaceDecimalSeparator(char* number, char separator){
@@ -234,6 +235,34 @@ void generateReturnAssembly(ThreeAddressCode* code, FILE* file) {
     free(label);
 }
 
+void generateGreaterAssembly(ThreeAddressCode* code, FILE* file) {
+    char *var1, *var2, *var3;
+    var1 = getLabelName(code->operator1->name, code->operator1->dataType);
+    var2 = getLabelName(code->operator2->name, code->operator2->dataType);
+    var3 = getLabelName(code->result->name, code->result->dataType);
+    fprintf(file,
+        "#greater than       \n"
+        "movl $0, %s(%%rip)  \n"
+        "movl %s(%%rip), %%eax\n"
+        "movl %s(%%rip), %%edx\n"
+        "cmpl %%eax, %%edx  \n"
+        "jle .L%d            \n"
+        "movl $1, %s(%%rip)  \n"
+        ".L%d:               \n"  
+        "                    \n",
+        var3,
+        var2,
+        var1,
+        g_labelCount,
+        var3,
+        g_labelCount
+    );
+    g_labelCount++;
+    free(var1);
+    free(var2);
+    free(var3);
+}
+
 void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
     FILE* file;
     file = fopen("out.s", "w");
@@ -314,6 +343,9 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
                 break;
             case TACRet:
                 generateReturnAssembly(ptr, file);
+                break;
+            case TACGreater:
+                generateGreaterAssembly(ptr, file);
                 break;
         }
     }
