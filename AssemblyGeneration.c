@@ -354,7 +354,6 @@ void generateAssembly(ThreeAddressCode* first, SymbolTable* table){
     FILE* file;
     file = fopen("out.s", "w");
     
-    
     //Start
     fprintf(file,
         "#template strings      \n"

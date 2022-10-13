@@ -95,12 +95,16 @@ ThreeAddressCode* generateCode(SyntaxTreeNode* node, SymbolTable* table){
                 result = generateWhile(subtrees[0], subtrees[1], table);
                 break;
                 
-            case FunctionNode:
+            case FunctionNode: 
                 result = joinCodes(subtrees[0], createCode(TACCall, node->symbol, NULL, insertTemporary(table, node->symbol->dataType)));
                 break;
             
-            case ExpressionListNode:
-                result = joinCodes(createCode(TACArg, NULL, NULL, subtrees[0]?subtrees[0]->result:NULL), subtrees[1]);
+            case ExpressionListNode:{
+                //result = joinCodes(createCode(TACArg, NULL, NULL, subtrees[0]?subtrees[0]->result:NULL), subtrees[1]);
+                //ThreeAddressCode* argument = createCode(TACSymbol, NULL, NULL, node->symbol);
+                //result = generateMoveCode(subtrees[0], argument);
+                result = joinCodes(createCode(TACMove, subtrees[0]?subtrees[0]->result:NULL, NULL, node->symbol), subtrees[1]);
+            }
                 break;
             
             // Operators

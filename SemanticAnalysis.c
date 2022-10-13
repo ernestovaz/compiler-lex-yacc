@@ -99,6 +99,15 @@ void analyzeCommand(SyntaxTreeNode* node, DataType returnType) {
                 analyzeCommand(node->children[1], returnType);
                 break;
             }
+            case PrintNode: {
+                SyntaxTreeNode* argumentList = node->children[0];
+                while (argumentList) {
+                    if(argumentList->children[0]) {
+                        getExpressionDataType(argumentList->children[0]);
+                    }
+                    argumentList = argumentList->children[1];
+                }
+            }
             default:
         }
     }
@@ -253,7 +262,7 @@ DataType getExpressionDataType(SyntaxTreeNode* expressionNode) {
             return dataType;
         }
                            
-        case FunctionNode: {
+        case FunctionNode: 
             if(symbol->type != SymbolFunction) {
                 fprintf(stderr, "error: Error non-function symbol used as function: %s\n", symbol->name);
                 errorCount++;
@@ -261,11 +270,9 @@ DataType getExpressionDataType(SyntaxTreeNode* expressionNode) {
             else checkFunctionUsage(expressionNode);
             return symbol->dataType;
             
-        }
-
         default:
     }
-    return 0; //for now accepts by default, ideally shouldn't
+    return 0; 
 }
 
 DataType dataTypeFromTypeNode(SyntaxTreeNode* node) {
@@ -350,11 +357,12 @@ void checkFunctionDeclaration(SyntaxTreeNode* node) {
         argumentList = argumentList->children[1];
         argumentCount++;
     }
-    DataType* arguments = malloc(argumentCount * sizeof(DataType));
+    Symbol** arguments;
+    arguments = malloc(argumentCount * sizeof(Symbol*));
     argumentList = node->children[1];
     int index = 0;
     while(argumentList != NULL) {
-        arguments[index] = dataTypeFromTypeNode(argumentList->children[0]);
+        arguments[index] = argumentList->symbol;
         argumentList = argumentList->children[1];
         index++;
     }
@@ -373,13 +381,14 @@ void checkFunctionUsage(SyntaxTreeNode* node) {
             errorCount++;
             return;
         }
-        DataType expectedType = functionSymbol->arguments[argumentCount - 1];
+        DataType expectedType = functionSymbol->arguments[argumentCount - 1]->dataType;
         DataType argumentType = getExpressionDataType(argumentList->children[0]);
         if(areTypesIncompatible(expectedType, argumentType)) {
             fprintf(stderr, "error: Incompatible arguments for function: %s\n", functionSymbol->name);
             errorCount++;
             return;
         }
+        argumentList->symbol = functionSymbol->arguments[argumentCount-1];
         argumentList = argumentList->children[1];
     }
     if(argumentCount < functionSymbol->argumentCount) {
